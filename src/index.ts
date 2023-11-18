@@ -1,13 +1,18 @@
 import mongoose from "mongoose";
 import app from "./app";
-const PORT = process.env.PORT || 3000;
+import dotenv from 'dotenv';
+dotenv.config();
 
-mongoose.connect("mongodb://127.0.0.1:27017/elearnify").then(()=>{
+const dbUrl:string = process.env.DB_URL ||" ";
+const port: number = parseInt(process.env.PORT || "3000");
+
+
+mongoose.connect(dbUrl).then(()=>{
     console.log("Database connected..");
     
 });
 
-app.listen(3000,()=>{
+app.listen(port,()=>{
     console.log('Server connected successfully...');
     
 })
