@@ -15,4 +15,12 @@ export  default class AuthService{
     async findUserByEmail(email: string): Promise<Iuser | null>{
         return await this.authRepository.findUserByEmail(email);
     }
+
+    async updateOtp(userId: string, otp: string): Promise<void> {
+        try {
+            return await this.authRepository.updateOtp(userId, otp);
+        } catch (error) {
+            throw error;
+        }
+    }
 }

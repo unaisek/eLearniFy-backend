@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import bcypt from 'bcrypt';
 import AuthService from "../services/AuthService";
+import { sendMail } from "../utils/mail";
 import { log } from "console";
 
 export default class AuthController{
@@ -11,8 +12,6 @@ export default class AuthController{
 
     async postRegister(req:Request, res: Response, next: NextFunction){
         try {
-            console.log("hi");
-            
             const { name, email, role, password } = req.body;
             const existingUser = await this.authService.findUserByEmail(email);
 
@@ -32,9 +31,12 @@ export default class AuthController{
             })
 
             if(user){
-                console.log(user,"user");
-                
+                sendMail({name: user.name, email: user.email, userId:user._id})
                 return res.status(200).json(user)
+            } else {
+                return res.status(400).json({
+                    message: "Can't Registered, some thing went wrong"
+                })
             }
             
         } catch (error) {
