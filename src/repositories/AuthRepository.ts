@@ -4,6 +4,8 @@ interface IAuthRepository{
     createUser(userDetails: Partial<Iuser>):Promise<Iuser | null>;
     findUserByEmail(email:string):Promise<Iuser | null>;
     updateOtp(userId: string ,otp: string): Promise<void>;
+    findById(userId: string): Promise<Iuser | null>;
+    updateVerifyStatus(userId: string, value: boolean): Promise <void>;
 
 }
 
@@ -19,6 +21,14 @@ export default class AuthRepository implements IAuthRepository{
 
     async updateOtp(userId: string, otp: string): Promise<void>{
         await User.updateOne({_id:userId},{otp})
+    }
+
+    async findById(userId: string): Promise<Iuser | null> {
+        return await User.findById(userId)
+    }
+
+    async updateVerifyStatus(userId: string, value: boolean): Promise <void> {
+         await User.updateOne({ _id: userId }, { $set: { is_verified: value, otp: '' } })
     }
 
 }

@@ -43,4 +43,36 @@ export default class AuthController{
             next(error)
         }
     }
+
+    async otpVerification(req:Request, res:Response, next: NextFunction){
+        try {
+
+            const otp = (req.body.otp).toString();
+            const id = (req.body.id).toString() ;
+            console.log(id,"id");
+            console.log(otp,"otp");
+            
+            
+
+            const userData = await this.authService.findById(id);
+
+            if(!userData){
+                return res.status(400).json({
+                    message:"User not found"
+                })
+            }
+
+            if(userData.otp === otp){
+                await this.authService.updateVerifyStatus(userData._id, true);
+                return res.status(200).json({
+                    message: "Success"
+                })
+            }
+        } catch (error) {
+            throw error;
+            next(error);
+        }
+    }
+
+
 }

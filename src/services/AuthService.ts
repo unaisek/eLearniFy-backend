@@ -23,4 +23,12 @@ export  default class AuthService{
             throw error;
         }
     }
+
+    async findById(userId: string): Promise <Iuser | null>{
+        return await this.authRepository.findById(userId);
+    }
+
+    async updateVerifyStatus(userId: string, value: boolean): Promise<void>{
+        await this.authRepository.updateVerifyStatus(userId, value)
+    }
 }
