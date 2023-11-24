@@ -3,17 +3,18 @@ import bcypt from 'bcrypt';
 import AuthService from "../services/AuthService";
 import { sendMail } from "../utils/mail";
 import { log } from "console";
+import { generateAuthToken, jwtVerify } from "../utils/jwt";
 
 export default class AuthController{
-    private authService: AuthService
+    private _authService: AuthService
     constructor(){
-        this.authService = new AuthService;
+        this._authService = new AuthService;
     }
 
     async postRegister(req:Request, res: Response, next: NextFunction){
         try {
             const { name, email, role, password } = req.body;
-            const existingUser = await this.authService.findUserByEmail(email);
+            const existingUser = await this._authService.findUserByEmail(email);
 
             if(existingUser){
                 return res.status(400).json({
@@ -23,7 +24,7 @@ export default class AuthController{
 
             const hashPassword = await bcypt.hash(password,10);
 
-            const user = await this.authService.createUser({
+            const user = await this._authService.createUser({
                 name,
                 email,
                 role,
@@ -54,7 +55,7 @@ export default class AuthController{
             
             
 
-            const userData = await this.authService.findById(id);
+            const userData = await this._authService.findById(id);
 
             if(!userData){
                 return res.status(400).json({
@@ -63,7 +64,7 @@ export default class AuthController{
             }
 
             if(userData.otp === otp){
-                await this.authService.updateVerifyStatus(userData._id, true);
+                await this._authService.updateVerifyStatus(userData._id, true);
                 return res.status(200).json({
                     message: "Success"
                 })
@@ -71,6 +72,67 @@ export default class AuthController{
         } catch (error) {
             throw error;
             next(error);
+        }
+    }
+
+    async userLogin(req: Request, res:Response, next: NextFunction){
+        try {
+            
+            const { email, password } = req.body;
+            const userData = await this._authService.findUserByEmail(email);
+            
+            if(!userData){
+                return res.status(401).json({
+                    message:"User is not found"
+                })
+            }
+
+            if(!userData.is_verified){
+                return res.status(401).json({
+                    message: "User not verified"
+                })
+            }
+
+            if(userData.is_blocked){
+                return res.status(401).json({
+                    message: "User is blocked"
+                })
+            }
+            
+            const passwordMatch = await bcypt.compare(password, userData.password);
+
+            if(!password){
+                return res.status(401).json({
+                    message: "password is incorrect"
+                })
+            }
+
+            const token = generateAuthToken(userData);
+            return res.status(200).json({token:token, role: userData.role})
+        } catch (error) {
+
+            next(error)
+        }
+    }
+
+    async userReverification(req: Request, res:Response, next: NextFunction){
+        try {           
+            const email = req.body.email;
+            
+            const userData = await this._authService.findUserByEmail(email);
+            console.log(userData);
+            
+
+            if(!userData){
+                return res.status(401).json({
+                    message:"User not found"
+                })
+            }
+
+            sendMail({name: userData.name, email:userData.email, userId:userData._id})
+            return res.status(200).json(userData)
+        } catch (error) {
+            next(error)
         }
     }
 

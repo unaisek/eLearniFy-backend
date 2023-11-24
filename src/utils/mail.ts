@@ -26,6 +26,7 @@ export const sendMail = async({ name, email, userId }: SendMailParams): Promise 
         console.log(otp);
 
         const authService = new AuthService();
+        
         await authService.updateOtp(userId, otp);
 
         const transporter = nodemailer.createTransport({
