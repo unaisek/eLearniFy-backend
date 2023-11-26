@@ -23,4 +23,8 @@ export default class AuthRepository implements IAuthRepository{
          await User.updateOne({ _id: userId }, { $set: { is_verified: value, otp: '' } })
     }
 
+    async  findAdminByEmail(email: string): Promise<Iuser | null> {
+        return await User.findOne({email:email,is_admin:true});
+    }
+
 }

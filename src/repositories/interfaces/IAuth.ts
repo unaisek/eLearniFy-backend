@@ -6,5 +6,6 @@ export interface IAuthRepository {
     updateOtp(userId: string, otp: string): Promise<void>;
     findById(userId: string): Promise<Iuser | null>;
     updateVerifyStatus(userId: string, value: boolean): Promise<void>;
+    findAdminByEmail(email:string):Promise<Iuser | null>;
 
 }

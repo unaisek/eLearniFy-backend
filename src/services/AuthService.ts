@@ -1,5 +1,8 @@
+import { error } from "console";
 import User, {Iuser} from "../models/User";
-import AuthRepository from "../repositories/AuthRepository"
+import AuthRepository from "../repositories/AuthRepository";
+import bcrypt from 'bcrypt';
+import { generateAuthToken } from "../utils/jwt";
 
 export  default class AuthService{
     private _authRepository: AuthRepository;
@@ -44,6 +47,29 @@ export  default class AuthService{
     async updateVerifyStatus(userId: string, value: boolean): Promise<void>{
         try {
             await this._authRepository.updateVerifyStatus(userId, value)            
+        } catch (error) {
+            throw error
+        }
+    }
+
+
+    async adminLogin(email:string,password:string): Promise<{token:string}>{
+        try {
+
+            const adminData = await this._authRepository.findAdminByEmail(email);
+
+            if(!adminData){
+                throw new Error("Admin not found")
+            } 
+
+            const passwordMatch = await bcrypt.compare(password,adminData.password);
+            if(!passwordMatch){
+                throw new Error("Incorrect password")
+            }
+
+            const token = generateAuthToken(adminData);
+            return {token}
+            
         } catch (error) {
             throw error
         }

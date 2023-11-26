@@ -50,8 +50,8 @@ export default class AuthController{
 
             const otp = (req.body.otp).toString();
             const id = (req.body.id).toString() ;
-            console.log(id,"id");
-            console.log(otp,"otp");
+            console.log(otp);
+            
             
             
 
@@ -101,7 +101,7 @@ export default class AuthController{
             
             const passwordMatch = await bcypt.compare(password, userData.password);
 
-            if(!password){
+            if (!passwordMatch){
                 return res.status(401).json({
                     message: "password is incorrect"
                 })
@@ -120,7 +120,6 @@ export default class AuthController{
             const email = req.body.email;
             
             const userData = await this._authService.findUserByEmail(email);
-            console.log(userData);
             
 
             if(!userData){
@@ -133,6 +132,35 @@ export default class AuthController{
             return res.status(200).json(userData)
         } catch (error) {
             next(error)
+        }
+    }
+
+
+    // admin login
+
+    async adminLoginPost(req:Request, res:Response, next: NextFunction){
+        try {
+
+            const { email,password } = req.body;
+            console.log(req.body,"iuihug");
+            
+            const token =  await this._authService.adminLogin(email,password);
+            res.status(200).json(token);
+            
+        } catch (error) {
+            let statusCode = 404;
+            let errorMessge = "Unauthorized user"
+
+            if ((error as Error).message == "Admin not found"){
+                statusCode = 404;
+                errorMessge = "Admin not found"
+            } else if ((error as Error).message =="Incorrect password"){
+                statusCode = 401;
+                errorMessge = "Incorrect password"
+            }
+
+            res.json(statusCode).json({message:errorMessge});
+            
         }
     }
 
