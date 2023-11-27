@@ -142,7 +142,6 @@ export default class AuthController{
         try {
 
             const { email,password } = req.body;
-            console.log(req.body,"iuihug");
             
             const token =  await this._authService.adminLogin(email,password);
             res.status(200).json(token);
