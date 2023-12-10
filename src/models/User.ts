@@ -8,7 +8,6 @@ export interface Iuser extends Document{
     is_verified: boolean;
     is_admin: boolean;
     is_blocked: boolean;
-    otp: string;
     token: string;
     courses:string[];
     createdAt: Date;
@@ -23,7 +22,6 @@ const userSchema = new Schema<Iuser>({
     is_verified: { type: Boolean, default: false },
     is_blocked: { type: Boolean, default: false },
     is_admin: { type: Boolean, default: false },
-    otp : { type: String, default: "" },
     token: { type: String, default:"" },
     courses :[
         {

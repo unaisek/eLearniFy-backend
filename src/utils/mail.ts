@@ -3,13 +3,14 @@ import AuthService from '../services/AuthService';
 import dotenv from 'dotenv';
 import AuthRepository from '../repositories/AuthRepository';
 import { type } from 'os';
+import { strict } from 'assert';
+import { IOtp } from '../models/otpModel';
 dotenv.config();
 
 
 type SendMailParams = {
     name: string,
     email: string,
-    userId: string
 }
 
 type EmailOptions = {
@@ -19,15 +20,16 @@ type EmailOptions = {
     html: string
 }
 
-export const sendMail = async({ name, email, userId }: SendMailParams): Promise <void> =>{
+export const sendMail = async({ name, email }: SendMailParams): Promise <void> =>{
     try {
 
         const otp = generateOtp();
         console.log(otp);
 
+    
         const authService = new AuthService();
         
-        await authService.updateOtp(userId, otp);
+        await authService.createOtp({email,otp});
 
         const transporter = nodemailer.createTransport({
             host: 'smtp.gmail.com',

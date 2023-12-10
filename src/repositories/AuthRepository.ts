@@ -1,4 +1,5 @@
 import User, {Iuser} from "../models/User"; 
+import otpModel from "../models/otpModel";
 import { IAuthRepository } from "./interfaces/IAuth";
 
 export default class AuthRepository implements IAuthRepository{
@@ -11,16 +12,16 @@ export default class AuthRepository implements IAuthRepository{
         return await User.findOne({email}).exec();
     }
 
-    async updateOtp(userId: string, otp: string): Promise<void>{
-        await User.updateOne({_id:userId},{otp})
-    }
+    // async updateOtp(userId: string, otp: string): Promise<void>{
+    //     await User.updateOne({_id:userId},{otp})
+    // }
 
     async findById(userId: string): Promise<Iuser | null> {
         return await User.findById(userId)
     }
 
-    async updateVerifyStatus(userId: string, value: boolean): Promise <void> {
-         await User.updateOne({ _id: userId }, { $set: { is_verified: value, otp: '' } })
+    async updateVerifyStatus(email: string): Promise <void> {
+         await User.updateOne({ email: email }, { $set: { is_verified: true, } })
     }
 
     async  findAdminByEmail(email: string): Promise<Iuser | null> {
