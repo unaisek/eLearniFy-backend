@@ -108,7 +108,7 @@ export default class AuthController{
             }
 
             const token = generateAuthToken(userData);
-            return res.status(200).json({token:token, role: userData.role})
+            return res.status(200).json({token:token, user:userData._id, role: userData.role})
         } catch (error) {
 
             next(error)

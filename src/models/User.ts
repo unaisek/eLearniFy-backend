@@ -1,4 +1,4 @@
-import { Document, Schema, model } from "mongoose";
+import mongoose, { Document, Schema, model } from "mongoose";
 
 export interface Iuser extends Document{
     name: string;
@@ -10,6 +10,7 @@ export interface Iuser extends Document{
     is_blocked: boolean;
     otp: string;
     token: string;
+    courses:string[];
     createdAt: Date;
     updatedAt: Date;
 }
@@ -24,6 +25,12 @@ const userSchema = new Schema<Iuser>({
     is_admin: { type: Boolean, default: false },
     otp : { type: String, default: "" },
     token: { type: String, default:"" },
+    courses :[
+        {
+            type:mongoose.Types.ObjectId,
+            ref:'course'
+        },
+    ]   
 
 }, { timestamps :true});
 
