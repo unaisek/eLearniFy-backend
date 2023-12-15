@@ -26,8 +26,8 @@ const chapterSchema = new Schema<IChapter>({
     type: String,
   },
   courseId: {
-    type: mongoose.Types.ObjectId,
-    ref: 'course',
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Course',
     required: true
   },
   createdAt :{

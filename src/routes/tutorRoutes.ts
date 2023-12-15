@@ -8,7 +8,10 @@ const catergoryController = new CategoryController();
 const courseController = new CourseController()
 
 router.get('/category',catergoryController.getAllCategory.bind(catergoryController));
-router.post('/add-course',upload.any(),courseController.addNewCourse.bind(courseController))
+router.post('/add-course',upload.any(),courseController.addNewCourse.bind(courseController));
+router.get('/all-courses/:id',courseController.getAllCourses.bind(courseController));
+router.get('/view-course/:id',courseController.getCourseDetails.bind(courseController))
+router.put('/update-course/:id',upload.any(),courseController.updateCourse.bind(courseController))
 
 
 export default router;

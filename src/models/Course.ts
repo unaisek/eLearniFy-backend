@@ -4,15 +4,16 @@ import { IChapter } from "./Chapter";
 
 export interface ICourse extends Document {
   title: string;
-  category: string;
+  category?: string;
   level: string;
   courseType: string;
   price: string;
   description: string;
   thumbnail: string;
   introductionVideo:string;
-  chapters:{chapter:String | IChapter , order:number }[];
+  chapters:{chapter:string, order:number }[];
   tutor?:string;
+  enrolledStudents?:string[];
   status: boolean;
   createdAt: Date;
   updatedAt: Date;
@@ -31,7 +32,8 @@ const courseSchema = new Schema<ICourse>({
     required: true,
   },
   category: {
-    type: String,
+    type: mongoose.Schema.Types.ObjectId,
+    ref:'Category',
     required: true,
   },
   level: {
@@ -62,8 +64,8 @@ const courseSchema = new Schema<ICourse>({
   chapters :[
     {
         chapter:{
-            type:mongoose.Types.ObjectId,
-            ref: 'chapter'
+            type:mongoose.Schema.Types.ObjectId,
+            ref: 'Chapter'
         },
         order:{
             type: Number
@@ -72,10 +74,16 @@ const courseSchema = new Schema<ICourse>({
     }
   ],
   tutor:{
-    type: mongoose.Types.ObjectId,
-    ref:"user",
+    type: mongoose.Schema.Types.ObjectId,
+    ref:"User",
     required:true
   },
+  enrolledStudents:[
+    {
+      type:mongoose.Schema.Types.ObjectId,
+      ref:"User",
+    }
+  ],
   status:{
     type: Boolean,
     default:true
