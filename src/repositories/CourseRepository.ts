@@ -52,7 +52,6 @@ export default class CourseRepository implements ICourseRepository {
 
   async updateCourse(courseId: string, updatedData: Partial<ICourse>): Promise<ICourse |null> {
     try {
-      console.log("updaterepository");
       
       return await Course.findByIdAndUpdate(courseId,updatedData)
       
@@ -60,5 +59,15 @@ export default class CourseRepository implements ICourseRepository {
       return null
     }
     
+  }
+
+  async updateChapter(chapterId: string, chapterData: Partial<IChapter>): Promise<IChapter | null> {
+    try {
+      
+      return await Chapter.findByIdAndUpdate(chapterId,chapterData)
+
+    } catch (error) {
+      return null
+    }
   }
 }

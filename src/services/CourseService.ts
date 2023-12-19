@@ -86,18 +86,23 @@ export default class CourseService implements ICourseService {
   }
 
   async createChapter(
-    req: Request,
+    _chapterData:Partial<IChapter>,
+    files: Express.Multer.File[],
     order: number,
     title: string | undefined,
     courseId: string
   ): Promise<ICourse | null> {
     try {
-      const multerReq = req as any;
-      const { chapterTitle, chapterDescription } = multerReq.body;
-      const chapterVideo = multerReq.files?.find(
+      // const multerReq = req as any;
+      const { chapterTitle, chapterDescription } = _chapterData ;
+      console.log(chapterTitle,chapterDescription,"chapter req");
+      console.log(courseId,"couseId");
+      
+      
+      const chapterVideo = files?.find(
         (file: Express.Multer.File) => file.fieldname === "chapterVideo"
       );
-      const chapterMaterial = multerReq.files?.find(
+      const chapterMaterial = files?.find(
         (file: Express.Multer.File) => file.fieldname === "chapterMaterial"
       );
       let chapterVideoURL: string | undefined;
@@ -145,6 +150,8 @@ export default class CourseService implements ICourseService {
         order,
       });
     } catch (error) {
+      console.log(error,"create chapter error");
+      
       throw Error;
     }
   }
@@ -153,6 +160,7 @@ export default class CourseService implements ICourseService {
     try {
       return await this._courseRepository.getAllCourses(tutorId);
     } catch (error) {
+      
       throw Error;
     }
   }
@@ -166,86 +174,11 @@ export default class CourseService implements ICourseService {
   }
 
   // update course
-
-  // async updateCourse(courseId:string,corseData:Partial<ICourse>,files:Express.Multer.File[] | undefined):Promise<ICourse | null> {
-  //   try {
-  //       const {
-  //         title,
-  //         category,
-  //         level,
-  //         courseType,
-  //         price,
-  //         description,
-  //         thumbnail,
-  //         introductionVideo
-  //       } = corseData;
-
-  //       if(files && files.length > 0 ){
-  //         console.log(files);
-
-  //         const uploadedThumbnail = files.find(file => file.fieldname === 'thumbnail');
-  //         const uploadedIntroductionVideo = files.find(file => file.fieldname === 'introductionVideo');
-  //         let updatedThumbnailURL: string | undefined;
-  //         if (uploadedThumbnail) {
-  //           const thumbnailParams: AWS.S3.PutObjectRequest = {
-  //             Bucket: process.env.AWS_S3_BUCKET_NAME!,
-  //             Key: `courses/${title}/thumbnail`,
-  //             Body: uploadedThumbnail.buffer,
-  //             ACL: "public-read",
-  //             ContentType: uploadedThumbnail.mimetype,
-  //           };
-  //           updatedThumbnailURL = await this._awsService.uploadToS3(
-  //             thumbnailParams
-  //           );
-  //         }
-
-  //         let updatedIntroductionVideoURL: string | undefined;
-  //         if (uploadedIntroductionVideo) {
-  //           const introductionVideoParams: AWS.S3.PutObjectRequest = {
-  //             Bucket: process.env.AWS_S3_BUCKET_NAME!,
-  //             Key: `courses/${title}/introductionVideo`,
-  //             Body: uploadedIntroductionVideo.buffer,
-  //             ACL: "public-read",
-  //             ContentType: uploadedIntroductionVideo.mimetype,
-  //           };
-  //           updatedIntroductionVideoURL = await this._awsService.uploadToS3(
-  //             introductionVideoParams
-  //           );
-  //         }
-
-  //         const updatedData = {
-  //           title,
-  //           category,
-  //           level,
-  //           courseType,
-  //           price,
-  //           description,
-  //           thumbnail:updatedThumbnailURL,
-  //           introductionVideo:updatedIntroductionVideoURL,
-  //         };
-
-  //         return await this._courseRepository.updateCourse(courseId,updatedData);
-
-  //       }
-
-  //       const updatedData = {
-  //         title,
-  //         category,
-  //         level,
-  //         courseType,
-  //         price,
-  //         description,
-  //         thumbnail,
-  //         introductionVideo,
-  //       };
-
-  //       return await this._courseRepository.updateCourse(courseId,updatedData);
-
-  //   } catch (error) {
-  //     throw Error;
-  //   }
-  // }
-  async updateCourse(courseId: string, courseData: Partial<ICourse>, files: Express.Multer.File[]): Promise<ICourse | null> {
+  async updateCourse(
+    courseId: string,
+    courseData: Partial<ICourse>,
+    files: Express.Multer.File[]
+  ): Promise<ICourse | null> {
     try {
       const {
         title,
@@ -259,14 +192,15 @@ export default class CourseService implements ICourseService {
       } = courseData;
 
       let updatedThumbnailURL: string | undefined = existingThumbnail;
-      let updatedIntroductionVideoURL: string | undefined = existingIntroductionVideo;
+      let updatedIntroductionVideoURL: string | undefined =
+        existingIntroductionVideo;
 
       if (files && files.length > 0) {
         const thumbnailFile = files.find(
           (file) => file.fieldname === "thumbnail"
         );
-        console.log(thumbnailFile,"image file");
-        
+        console.log(thumbnailFile, "image file");
+
         const introductionVideoFile = files.find(
           (file) => file.fieldname === "introductionVideo"
         );
@@ -283,7 +217,6 @@ export default class CourseService implements ICourseService {
             thumbnailParams
           );
           console.log(updatedThumbnailURL);
-          
         }
 
         if (introductionVideoFile) {
@@ -316,4 +249,85 @@ export default class CourseService implements ICourseService {
       throw error;
     }
   }
+
+  async updateChapter(
+    id: string,
+    chapterData: Partial<IChapter>,
+    files: Express.Multer.File[],
+    courseTitle: string
+  ): Promise<IChapter | null> {
+    const {
+      chapterTitle,
+      chapterDescription,
+      chapterVideo: existingChapterVideo,
+      chapterMaterial: existingChapterMaterial,
+    } = chapterData;
+
+    let updatedChapterVideo: string | undefined = existingChapterVideo;
+    let updatedChapterMaterail: string | undefined = existingChapterMaterial;
+
+    if (files && files.length > 0) {
+      const chapterVideoFile = files.find(
+        (file) => file.fieldname == "chapterVideo"
+      );
+      const chapterMaterialFile = files.find(
+        (file) => file.fieldname == "chapterMaterial"
+      );
+
+      if (chapterVideoFile) {
+        const chapterVideoParams: AWS.S3.PutObjectRequest = {
+          Bucket: process.env.AWS_S3_BUCKET_NAME!,
+          Key: `courses/${courseTitle}/${chapterTitle}/chapterVideo`,
+          Body: chapterVideoFile.buffer,
+          ACL: "public-read",
+          ContentType: chapterVideoFile.mimetype,
+        };
+
+        updatedChapterVideo = await this._awsService.uploadToS3(
+          chapterVideoParams
+        );
+      }
+
+      if (chapterMaterialFile) {
+        const chapterMaterialParams: AWS.S3.PutObjectRequest = {
+          Bucket: process.env.AWS_S3_BUCKET_NAME!,
+          Key: `courses/${courseTitle}/${chapterTitle}/chapterVideo`,
+          Body: chapterMaterialFile.buffer,
+          ACL: "public-read",
+          ContentType: chapterMaterialFile.mimetype,
+        };
+
+        updatedChapterMaterail = await this._awsService.uploadToS3(
+          chapterMaterialParams
+        );
+      }
+    }
+
+    const updateChapterData = {
+      chapterTitle,
+      chapterDescription,
+      chapterVideo: updatedChapterVideo,
+      chapterMaterial: updatedChapterMaterail,
+    };
+
+    return await this._courseRepository.updateChapter(id, updateChapterData);
+  }
+
+  // add new Chapter To existing course
+
+  // async addNewChapterToCourse(
+  //     courseId: string, 
+  //     chapterData: Partial<IChapter>, 
+  //     files: Express.Multer.File[],
+  //     order:number,
+  //     courseTitle: string
+  //   ): Promise<any> {
+  //     try {
+
+  //       const {chapterTitle, chapterDescription} = chapterData;
+        
+  //     } catch (error) {
+  //       throw Error
+  //     }
+  // }
 }
