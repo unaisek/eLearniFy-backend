@@ -5,6 +5,7 @@ import bodyParser from "body-parser";
 import authRoutes from "./routes/authRoutes"; 
 import adminRoutes from "./routes/adminRoutes";
 import tutorRoutes from "./routes/tutorRoutes";
+import userRoutes from "./routes/userRoutes";
 
 const app = express();
 app.use(cors({ credentials: true, origin: 'http://localhost:4200' }));
@@ -13,6 +14,7 @@ app.use(bodyParser.json())
 app.use(express.json());
 app.use('/api/auth', authRoutes);
 app.use('/api/admin', adminRoutes);
-app.use('/api/tutor', tutorRoutes)
+app.use('/api/tutor', tutorRoutes);
+app.use('/api/user',userRoutes)
 
 export default app;

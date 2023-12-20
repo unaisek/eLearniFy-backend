@@ -32,11 +32,5 @@ export interface ICourseService {
     courseTitle: string
   ): Promise<IChapter | null>;
 
-  // addNewChapterToCourse(
-  //   courseId:string, 
-  //   chapterData: Partial<IChapter>, 
-  //   files: Express.Multer.File[],
-  //   order: number,
-  //   courseTitle: string | undefined
-  //   ): Promise <any>;
+  getAllCourseForStudents(): Promise <ICourse[] | null>;
 }

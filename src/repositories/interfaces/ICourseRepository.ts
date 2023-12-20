@@ -10,6 +10,7 @@ export interface ICourseRepository {
   findCourseById(courseId:string): Promise <ICourse | null>;
 
   updateCourse(courseId:string ,updatedData:Partial<ICourse>):Promise<ICourse | null>;
-  updateChapter(chapterId:string,chapterData:IChapter):Promise <IChapter | null>
+  updateChapter(chapterId:string,chapterData:IChapter):Promise <IChapter | null>;
+  getCoursesForStudents(): Promise<ICourse[] | null>;
 
 }

@@ -313,21 +313,9 @@ export default class CourseService implements ICourseService {
     return await this._courseRepository.updateChapter(id, updateChapterData);
   }
 
-  // add new Chapter To existing course
+// fetching courses for students
 
-  // async addNewChapterToCourse(
-  //     courseId: string, 
-  //     chapterData: Partial<IChapter>, 
-  //     files: Express.Multer.File[],
-  //     order:number,
-  //     courseTitle: string
-  //   ): Promise<any> {
-  //     try {
-
-  //       const {chapterTitle, chapterDescription} = chapterData;
-        
-  //     } catch (error) {
-  //       throw Error
-  //     }
-  // }
+ async getAllCourseForStudents(): Promise<ICourse[] | null> {
+    return await  this._courseRepository.getCoursesForStudents()
+ } 
 }

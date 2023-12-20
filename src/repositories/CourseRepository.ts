@@ -70,4 +70,15 @@ export default class CourseRepository implements ICourseRepository {
       return null
     }
   }
+
+  async getCoursesForStudents(): Promise<ICourse[] | null> {
+    try {
+
+      return await Course.find().populate('tutor').populate('category').populate('chapters.chapter');
+      
+    } catch (error) {
+      return null
+    }
+    
+  }
 }

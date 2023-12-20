@@ -63,6 +63,8 @@ export default class CourseController {
 
          const courseId = req.params.id;
          const courseData = req.body;
+         console.log(courseData);
+         
          const files = req.files as Express.Multer.File[];
 
          const updatedData = await this._courseService.updateCourse(
@@ -123,5 +125,17 @@ export default class CourseController {
         next(error)
     }
 
+  }
+
+//   fetching all courses for students
+
+  async getAllCoursesForStudent(req: Request, res: Response, next: NextFunction){
+    try {
+        const courseLists =  await this._courseService.getAllCourseForStudents();
+        res.status(200).json(courseLists)
+        
+    } catch (error) {
+        next(error)
+    }
   }
 }
