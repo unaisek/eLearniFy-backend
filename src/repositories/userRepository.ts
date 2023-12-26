@@ -16,7 +16,7 @@ export default class UserRepository implements IUserRepository{
         try {
             await User.updateOne({_id:id},{$set: { is_blocked: true }});            
         } catch (error) {
-            
+            throw Error
         }
     }
 
@@ -24,8 +24,37 @@ export default class UserRepository implements IUserRepository{
         try {
             await User.updateOne({_id: id}, { $set: { is_blocked: false }})
         } catch (error) {
-            
+            throw Error
         }
+    }
+
+    async findUserById(userId: string): Promise<Iuser | null> {
+        try {
+            return await User.findById(userId)
+            
+        } catch (error) {
+
+            return null
+        }
+        
+    }
+
+    async updateProfileImage(userId: string, profileImage: string): Promise<Iuser | null> {
+
+        try {
+            const updatedUser = await User.findByIdAndUpdate(
+              { _id: userId }, 
+              { $set: { profileImage } }, 
+              { new: true } 
+            );
+
+            return updatedUser
+
+            
+        } catch (error) {
+            throw error
+        }
+        
     }
 
 }

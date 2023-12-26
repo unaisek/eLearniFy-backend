@@ -22,6 +22,6 @@ const otpSchema = new Schema<IOtp>({
     }
 })
 
-otpSchema.index({createdAt:1},{expireAfterSeconds:120})
+otpSchema.index({createdAt:1},{expireAfterSeconds:60})
 
 export default model<IOtp>('otp',otpSchema)

@@ -6,7 +6,10 @@ import CourseRepository from "../repositories/CourseRepository";
 import { ICourse } from "../models/Course";
 import { title } from "process";
 import { IChapter } from "../models/Chapter";
+import Stripe from "stripe";
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
 dotenv.config();
+
 // interface customRequest extends Request  {
 //     File?.Express.Multer.File[]
 // }
@@ -94,11 +97,7 @@ export default class CourseService implements ICourseService {
   ): Promise<ICourse | null> {
     try {
       // const multerReq = req as any;
-      const { chapterTitle, chapterDescription } = _chapterData ;
-      console.log(chapterTitle,chapterDescription,"chapter req");
-      console.log(courseId,"couseId");
-      
-      
+      const { chapterTitle, chapterDescription } = _chapterData ;         
       const chapterVideo = files?.find(
         (file: Express.Multer.File) => file.fieldname === "chapterVideo"
       );
@@ -318,4 +317,38 @@ export default class CourseService implements ICourseService {
  async getAllCourseForStudents(): Promise<ICourse[] | null> {
     return await  this._courseRepository.getCoursesForStudents()
  } 
+
+
+//  make stripe payment checkout session
+  async createCheckoutSession(courseId: string): Promise<string> {
+    try {
+      
+      const course = await this._courseRepository.findCourseById(courseId);
+      const session = await stripe.checkout.sessions.create({
+        payment_method_types: ["card"],
+        mode: "payment",
+        line_items: [
+          {
+            price_data: {
+              currency: "inr",
+              product_data: {
+                name: course?.title as string,
+              },
+              unit_amount: parseInt(course?.price!) * 100,
+            },
+            quantity: 1,
+          },
+        ],
+        success_url: `${process.env.CLIENT_URL}/user/payment-success?session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `${process.env.CLIENT_URL}/user/course-over-view/${course?._id}`,
+      });
+
+      return session.id
+
+    } catch (error) {
+      throw Error
+    }
+    
+    
+  }
 }

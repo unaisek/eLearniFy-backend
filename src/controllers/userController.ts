@@ -40,4 +40,38 @@ export default class UserController{
             message:"User is Unblocked"
         })
     }
+
+
+    async getUserData(req:Request, res:Response, next:NextFunction){
+        try {
+
+            const userId = req.params.id;
+            const userData = await this._userService.getUserData(userId);
+            if(userData){
+                res.status(200).json(userData)
+            }
+            
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    async uploadProfileImage(req:Request, res:Response, next:NextFunction){
+        try {           
+            const file = req.files as Express.Multer.File[];
+            const { userId } = req.body;
+            console.log(userId);
+            
+
+            const result = await this._userService.uploadProfileImage(file,userId);
+            console.log(result);
+            
+            if(result){
+                res.status(200).json(result)
+            }
+            
+        } catch (error) {
+            next(error)
+        }
+    }
 }

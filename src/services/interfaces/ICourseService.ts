@@ -32,5 +32,7 @@ export interface ICourseService {
     courseTitle: string
   ): Promise<IChapter | null>;
 
-  getAllCourseForStudents(): Promise <ICourse[] | null>;
+  getAllCourseForStudents(): Promise<ICourse[] | null>;
+
+  createCheckoutSession(courseId:string): Promise<string>;
 }
