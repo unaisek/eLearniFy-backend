@@ -74,11 +74,41 @@ export default class CourseRepository implements ICourseRepository {
   async getCoursesForStudents(): Promise<ICourse[] | null> {
     try {
 
-      return await Course.find().populate('tutor').populate('category').populate('chapters.chapter');
+      return await Course.find({status:true}).populate('tutor').populate('category').populate('chapters.chapter');
       
     } catch (error) {
       return null
     }
     
+  }
+
+  async unlistCourse(courseId: string): Promise<ICourse | null> {
+    try {
+
+       return await Course.findByIdAndUpdate(
+         courseId,
+         { status: false },
+         { new: true }
+       );
+      
+    } catch (error) {
+      
+      return null
+    }
+   
+  }
+
+  async listCourse(courseId: string): Promise<ICourse | null> {
+    try {
+       return await Course.findByIdAndUpdate(
+         courseId,
+         { status: true },
+         { new: true }
+       );
+      
+    } catch (error) {
+      return null
+    }
+
   }
 }

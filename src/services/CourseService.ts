@@ -351,4 +351,24 @@ export default class CourseService implements ICourseService {
     
     
   }
+
+  async unlistCourse(courseId: string): Promise<ICourse | null> {
+    try {
+
+      return await this._courseRepository.unlistCourse(courseId)
+      
+    } catch (error) {
+      throw error
+    }
+  }
+
+  async listCourse(courseId: string): Promise<ICourse | null> {
+    try {
+
+      return await this._courseRepository.listCourse(courseId)
+      
+    } catch (error) {
+      throw error
+    }
+  }
 }

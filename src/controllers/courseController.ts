@@ -2,6 +2,7 @@ import { log } from "console";
 import { Request,Response,NextFunction } from "express";
 import CourseService from "../services/CourseService";
 import dotenv from 'dotenv'
+import { nextTick } from "process";
 dotenv.config()
 
 
@@ -156,6 +157,31 @@ export default class CourseController {
       res.status(200).json(sessionUrl)
 
       
+      
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  async unlistCourse(req:Request, res:Response,next:NextFunction){
+    try {
+
+      const courseId = req.params.courseId;
+      const courseData = await this._courseService.unlistCourse(courseId)
+      res.status(200).json(courseData)
+      
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  async listCourse(req: Request, res: Response, next: NextFunction){
+    try {
+      const courseId = req.params.courseId;
+      const courseData = await this._courseService.listCourse(courseId);
+      if(courseData){
+        res.status(200).json(courseData)
+      }
       
     } catch (error) {
       next(error)

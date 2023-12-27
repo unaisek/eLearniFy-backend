@@ -34,5 +34,9 @@ export interface ICourseService {
 
   getAllCourseForStudents(): Promise<ICourse[] | null>;
 
-  createCheckoutSession(courseId:string): Promise<string>;
+  createCheckoutSession(courseId: string): Promise<string>;
+
+  unlistCourse(courseId: string): Promise<ICourse | null>;
+  listCourse(courseId:string):Promise<ICourse | null>;
+  
 }
