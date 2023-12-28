@@ -24,7 +24,6 @@ export default class CourseService implements ICourseService {
   async addNewCourse(req: Request): Promise<Partial<ICourse> | null> {
     try {
       const multerReq = req as any;
-      // console.log(multerReq.body);
 
       const {
         title,
@@ -52,7 +51,6 @@ export default class CourseService implements ICourseService {
           ContentType: thumbnail.mimetype,
         };
         thumbnailURL = await this._awsService.uploadToS3(thumbnailParams);
-        console.log(thumbnailURL, "url");
       }
 
       let introductionVideoURL: string | undefined;
@@ -67,7 +65,6 @@ export default class CourseService implements ICourseService {
         introductionVideoURL = await this._awsService.uploadToS3(
           introductionVideoParams
         );
-        console.log(introductionVideoURL, "url");
       }
 
       const courseData = {
@@ -114,7 +111,6 @@ export default class CourseService implements ICourseService {
           ContentType: chapterVideo.mimetype,
         };
         chapterVideoURL = await this._awsService.uploadToS3(chapterVideoParams);
-        console.log(chapterVideoURL, "url");
       }
 
       let chapterMaterialURL: string | undefined;
@@ -129,7 +125,6 @@ export default class CourseService implements ICourseService {
         chapterMaterialURL = await this._awsService.uploadToS3(
           chapterMaterialParams
         );
-        console.log(chapterMaterialURL, "url");
       }
 
       const chapterDetails = {
@@ -198,7 +193,6 @@ export default class CourseService implements ICourseService {
         const thumbnailFile = files.find(
           (file) => file.fieldname === "thumbnail"
         );
-        console.log(thumbnailFile, "image file");
 
         const introductionVideoFile = files.find(
           (file) => file.fieldname === "introductionVideo"
@@ -215,7 +209,6 @@ export default class CourseService implements ICourseService {
           updatedThumbnailURL = await this._awsService.uploadToS3(
             thumbnailParams
           );
-          console.log(updatedThumbnailURL);
         }
 
         if (introductionVideoFile) {
@@ -366,6 +359,16 @@ export default class CourseService implements ICourseService {
     try {
 
       return await this._courseRepository.listCourse(courseId)
+      
+    } catch (error) {
+      throw error
+    }
+  }
+
+  async deleteChapterFromCourse(courseId: string, chapterId: string): Promise<ICourse | null> {
+    try {
+
+      return await this._courseRepository.deleteChapterFromCourse(courseId,chapterId);
       
     } catch (error) {
       throw error

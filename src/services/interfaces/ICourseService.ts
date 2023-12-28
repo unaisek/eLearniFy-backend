@@ -37,6 +37,6 @@ export interface ICourseService {
   createCheckoutSession(courseId: string): Promise<string>;
 
   unlistCourse(courseId: string): Promise<ICourse | null>;
-  listCourse(courseId:string):Promise<ICourse | null>;
-  
+  listCourse(courseId: string): Promise<ICourse | null>;
+  deleteChapterFromCourse(courseId:string, chapterId:string): Promise <ICourse | null>;
 }

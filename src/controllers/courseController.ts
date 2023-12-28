@@ -64,7 +64,6 @@ export default class CourseController {
     try {
       const courseId = req.params.id;
       const courseData = req.body;
-      console.log(courseData);
 
       const files = req.files as Express.Multer.File[];
 
@@ -106,9 +105,7 @@ export default class CourseController {
   async addNewChapterToCourse(req: Request, res: Response, next: NextFunction) {
     try {
       const chapterData = req.body;
-      console.log(chapterData, "controller data");
       const courseId = req.params.courseId;
-      console.log(courseId, "controller id");
 
       const files = req.files as Express.Multer.File[];
       const { courseTitle } = req.body;
@@ -151,10 +148,8 @@ export default class CourseController {
     try {
 
       const { courseId } = req.body
-      const sessionUrl=await this._courseService.createCheckoutSession(courseId);
-      // console.log(sessionId,"sessionsId");
-      
-      res.status(200).json(sessionUrl)
+      const sessionId=await this._courseService.createCheckoutSession(courseId);    
+      res.status(200).json(sessionId)
 
       
       
@@ -185,6 +180,20 @@ export default class CourseController {
       
     } catch (error) {
       next(error)
+    }
+  }
+
+  async deleteChapter(req:Request, res:Response, next:NextFunction){
+    try {
+      const {courseId,chapterId} = req.body;
+      const updatedData = await this._courseService.deleteChapterFromCourse(courseId,chapterId); 
+      if(updatedData){
+        res.status(200).json(updatedData)
+      }
+       
+      
+    } catch (error) {
+      
     }
   }
 }

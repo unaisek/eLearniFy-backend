@@ -19,7 +19,8 @@ router.post('/add-chapter/:courseId',upload.any(),courseController.addNewChapter
 router.get("/profile/:id", userController.getUserData.bind(userController));
 router.put('/upload-profile',upload.any(),userController.uploadProfileImage.bind(userController));
 router.put('/unlist-course/:courseId',courseController.unlistCourse.bind(courseController));
-router.put('/list-course/:courseId',courseController.listCourse.bind(courseController))
+router.put('/list-course/:courseId',courseController.listCourse.bind(courseController));
+router.put("/delete-chapter",courseController.deleteChapter.bind(courseController));
 
 
 

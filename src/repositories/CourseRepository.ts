@@ -111,4 +111,19 @@ export default class CourseRepository implements ICourseRepository {
     }
 
   }
+
+  async deleteChapterFromCourse(courseId: string, chapterId: string): Promise<ICourse | null> {
+    try {
+      console.log(chapterId);
+      
+      return await Course.findByIdAndUpdate(
+        { _id:courseId },
+        { $pull: { chapters: { _id : chapterId } } },
+        { new:true }
+        )
+      
+    } catch (error) {
+      throw error
+    }
+  }
 }
