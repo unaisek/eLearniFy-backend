@@ -7,6 +7,9 @@ import { ICourse } from "../models/Course";
 import { title } from "process";
 import { IChapter } from "../models/Chapter";
 import Stripe from "stripe";
+import EnrolledCourseRepository from "../repositories/EnrolledCourseRepository";
+import { IEnrolledCourse } from "../models/EnrolledCourse";
+import UserRepository from "../repositories/userRepository";
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
 dotenv.config();
 
@@ -17,9 +20,13 @@ dotenv.config();
 export default class CourseService implements ICourseService {
   private _awsService: AwsS3Service;
   private _courseRepository: CourseRepository;
+  private _enrolledRepository: EnrolledCourseRepository;
+  private _userRepository:UserRepository;
   constructor() {
     this._awsService = new AwsS3Service();
     this._courseRepository = new CourseRepository();
+    this._enrolledRepository = new EnrolledCourseRepository();
+    this._userRepository = new UserRepository();
   }
   async addNewCourse(req: Request): Promise<Partial<ICourse> | null> {
     try {
@@ -332,10 +339,9 @@ export default class CourseService implements ICourseService {
             quantity: 1,
           },
         ],
-        success_url: `${process.env.CLIENT_URL}/user/payment-success?session_id={CHECKOUT_SESSION_ID}`,
+        success_url: `${process.env.CLIENT_URL}/user/payment-success?courseId=${course?._id}`,
         cancel_url: `${process.env.CLIENT_URL}/user/course-over-view/${course?._id}`,
-      });
-
+      });     
       return session.id
 
     } catch (error) {
@@ -373,5 +379,30 @@ export default class CourseService implements ICourseService {
     } catch (error) {
       throw error
     }
+  }
+
+  async enrollCourse(courseId: string, userId: string): Promise<IEnrolledCourse> {
+    try {
+
+      const checkenrolled = await this._enrolledRepository.checkEnrolledCourse(userId,courseId);
+      if(checkenrolled){
+        throw new Error("course already enrolled");
+      }
+      const courseData = await this._courseRepository.findCourseById(courseId);
+
+      await this._userRepository.enrollCourse(userId, courseId);
+      const enrollDetails = {
+        courseId,
+        userId,
+        price: courseData?.price,
+      };
+
+      const enrolledCourse = await this._enrolledRepository.createEnrolledCourse(enrollDetails);
+      return enrolledCourse;
+      
+    } catch (error) {
+      throw error
+    }
+
   }
 }

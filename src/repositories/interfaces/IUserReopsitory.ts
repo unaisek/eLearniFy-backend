@@ -6,4 +6,5 @@ export interface IUserRepository {
   unBlockUser(id: string): Promise<void>;
   findUserById(userId: string): Promise<Iuser | null>;
   updateProfileImage(userId:string,profileImage:string):Promise<Iuser | null>;
+  enrollCourse(userId: string, courseId:string):Promise<void>;
 }

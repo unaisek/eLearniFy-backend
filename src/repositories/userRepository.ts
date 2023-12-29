@@ -57,4 +57,17 @@ export default class UserRepository implements IUserRepository{
         
     }
 
+    async enrollCourse(userId: string, courseId: string): Promise<void> {
+        try {
+
+            await User.findOneAndUpdate(
+                { _id : userId },
+                { $push: { courses: courseId } }
+            )
+            
+        } catch (error) {
+            throw error
+        }
+    }
+
 }

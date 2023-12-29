@@ -73,7 +73,7 @@ export default class CourseController {
         files
       );
       if (updatedData) {
-        res.json(200).json(updatedData);
+        res.status(200).json(updatedData);
       }
     } catch (error) {
       next(error);
@@ -149,6 +149,8 @@ export default class CourseController {
 
       const { courseId } = req.body
       const sessionId=await this._courseService.createCheckoutSession(courseId);    
+      console.log(sessionId);
+      
       res.status(200).json(sessionId)
 
       
@@ -190,10 +192,22 @@ export default class CourseController {
       if(updatedData){
         res.status(200).json(updatedData)
       }
-       
+            
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  async enrollCourse(req:Request, res:Response, next:NextFunction){
+    try {
+      const { userId, courseId } = req.body;     
+      const enrolledData = await this._courseService.enrollCourse(courseId,userId);
+      if(enrolledData){
+        res.status(200).json(enrolledData)
+      }
       
     } catch (error) {
-      
+      next(error)
     }
   }
 }
