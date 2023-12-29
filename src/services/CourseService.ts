@@ -10,9 +10,11 @@ import Stripe from "stripe";
 import EnrolledCourseRepository from "../repositories/EnrolledCourseRepository";
 import { IEnrolledCourse } from "../models/EnrolledCourse";
 import UserRepository from "../repositories/userRepository";
+import WalletRepository from "../repositories/WalletRepository";
+import { error } from "console";
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
 dotenv.config();
-
+const TUTOR_COURSE_PERCENTAGE = 70;
 // interface customRequest extends Request  {
 //     File?.Express.Multer.File[]
 // }
@@ -22,11 +24,13 @@ export default class CourseService implements ICourseService {
   private _courseRepository: CourseRepository;
   private _enrolledRepository: EnrolledCourseRepository;
   private _userRepository:UserRepository;
+  private _walletRepository: WalletRepository;
   constructor() {
     this._awsService = new AwsS3Service();
     this._courseRepository = new CourseRepository();
     this._enrolledRepository = new EnrolledCourseRepository();
     this._userRepository = new UserRepository();
+    this._walletRepository = new WalletRepository();
   }
   async addNewCourse(req: Request): Promise<Partial<ICourse> | null> {
     try {
@@ -389,16 +393,49 @@ export default class CourseService implements ICourseService {
         throw new Error("course already enrolled");
       }
       const courseData = await this._courseRepository.findCourseById(courseId);
+      if(courseData){
+        await this._userRepository.enrollCourse(userId, courseId);
+        const enrollDetails = {
+          courseId,
+          userId,
+          price: courseData?.price,
+        };
 
-      await this._userRepository.enrollCourse(userId, courseId);
-      const enrollDetails = {
-        courseId,
-        userId,
-        price: courseData?.price,
-      };
+        const enrolledCourse =
+          await this._enrolledRepository.createEnrolledCourse(enrollDetails);
 
-      const enrolledCourse = await this._enrolledRepository.createEnrolledCourse(enrollDetails);
-      return enrolledCourse;
+        if (courseData?.courseType === "paid") {
+          const tutorRevenue =
+            parseInt(courseData?.price) * (TUTOR_COURSE_PERCENTAGE / 100);
+          const description = `Course Enrollment revenue from ${courseData?.title}`;
+          const transactionType = "Credited";
+
+          const tutorId = courseData?.tutor;
+          if(tutorId){
+            const existingWallet =
+              await this._walletRepository.findWalletByUser(tutorId);
+
+            if (!existingWallet) {
+              const walletData = {
+                userId: tutorId,
+              };
+              await this._walletRepository.createWallet(walletData);
+            }
+            const transactionsData = {
+              amount: tutorRevenue,
+              description,
+              transactionType,
+            };
+            await this._walletRepository.addTransctionToWallet(
+              tutorId,
+              transactionsData
+            );
+          }
+        }
+        return enrolledCourse;
+      } else {
+        throw new Error("Course is not found")
+      }
       
     } catch (error) {
       throw error

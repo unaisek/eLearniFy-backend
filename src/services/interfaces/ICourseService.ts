@@ -1,6 +1,7 @@
 import { Request } from "express";
 import { ICourse } from "../../models/Course";
 import { IChapter } from "../../models/Chapter";
+import { IEnrolledCourse } from "../../models/EnrolledCourse";
 
 
 
@@ -39,4 +40,5 @@ export interface ICourseService {
   unlistCourse(courseId: string): Promise<ICourse | null>;
   listCourse(courseId: string): Promise<ICourse | null>;
   deleteChapterFromCourse(courseId:string, chapterId:string): Promise <ICourse | null>;
+  enrollCourse(courseId: string, userId:string): Promise <IEnrolledCourse>;
 }
