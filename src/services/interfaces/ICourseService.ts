@@ -35,7 +35,7 @@ export interface ICourseService {
 
   getAllCourseForStudents(): Promise<ICourse[] | null>;
 
-  createCheckoutSession(courseId: string): Promise<string>;
+  createCheckoutSession(courseId: string, userId: string): Promise<string>;
 
   unlistCourse(courseId: string): Promise<ICourse | null>;
   listCourse(courseId: string): Promise<ICourse | null>;
@@ -43,6 +43,7 @@ export interface ICourseService {
     courseId: string,
     chapterId: string
   ): Promise<ICourse | null>;
-  enrollCourse(courseId: string, userId: string): Promise<IEnrolledCourse>;
-  getEnrolledCoursesForUser( userId: string ): Promise<IEnrolledCourse[] | null>
+  enrollCourse(courseId: string, userId: string): Promise<IEnrolledCourse | null >;
+  getEnrolledCoursesForUser(userId: string): Promise<IEnrolledCourse[] | null>;
+  cancelEnrolledCourse(userId: string, courseId: string): Promise <IEnrolledCourse | null >
 }

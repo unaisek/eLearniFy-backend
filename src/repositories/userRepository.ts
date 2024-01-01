@@ -70,4 +70,17 @@ export default class UserRepository implements IUserRepository{
         }
     }
 
+    async removeCourseFromUser(userId: string, courseId: string): Promise<void> {
+        try {
+
+            await User.findOneAndUpdate(
+                { _id: userId },
+                { $pull : { courses: courseId } }
+            )
+            
+        } catch (error) {
+            throw error
+        }
+    }
+
 }

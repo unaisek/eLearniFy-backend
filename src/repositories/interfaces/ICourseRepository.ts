@@ -22,5 +22,10 @@ export interface ICourseRepository {
   getCoursesForStudents(): Promise<ICourse[] | null>;
   unlistCourse(courseId: string): Promise<ICourse | null>;
   listCourse(courseId: string): Promise<ICourse | null>;
-  deleteChapterFromCourse(courseId:string, chapterId: string): Promise <ICourse | null>
+  deleteChapterFromCourse(
+    courseId: string,
+    chapterId: string
+  ): Promise<ICourse | null>;
+  addEnrolledUserToCourse(courseId: string, userId: string): Promise<void>;
+  removeUserFromCourse(courseId: string, userId: string) :Promise <void>
 }

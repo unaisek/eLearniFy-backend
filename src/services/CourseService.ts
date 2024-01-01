@@ -324,9 +324,15 @@ export default class CourseService implements ICourseService {
 
 
 //  make stripe payment checkout session
-  async createCheckoutSession(courseId: string): Promise<string> {
+  async createCheckoutSession(courseId: string, userId: string): Promise<string> {
     try {
       
+      const checkenrolled = await this._enrolledRepository.checkEnrolledCourse(userId,courseId);
+      if(checkenrolled){
+        if(checkenrolled?.status == true){
+          throw new Error("Course already enrolled")
+        }
+      }
       const course = await this._courseRepository.findCourseById(courseId);
       const session = await stripe.checkout.sessions.create({
         payment_method_types: ["card"],
@@ -351,8 +357,7 @@ export default class CourseService implements ICourseService {
     } catch (error) {
       throw Error
     }
-    
-    
+      
   }
 
   async unlistCourse(courseId: string): Promise<ICourse | null> {
@@ -385,13 +390,32 @@ export default class CourseService implements ICourseService {
     }
   }
 
-  async enrollCourse(courseId: string, userId: string): Promise<IEnrolledCourse> {
+  async enrollCourse(courseId: string, userId: string): Promise<IEnrolledCourse | null > {
     try {
 
       const checkenrolled = await this._enrolledRepository.checkEnrolledCourse(userId,courseId);
       if(checkenrolled){
-        throw new Error("course already enrolled");
+
+        if(checkenrolled?.status == false){
+          const enrolledData = await this._enrolledRepository.updateEnrolledCourseStatus(userId,courseId,true);
+          await this._courseRepository.addEnrolledUserToCourse(
+            courseId,
+            userId
+          );
+          const courseData = await this._courseRepository.findCourseById(
+            courseId
+          );
+
+          if(courseData?.courseType == "paid"){
+            await this.handleTutorRevenue(courseData)
+          }
+          return enrolledData
+        } else {
+          throw new Error("Course Already enrolled")
+        }
       }
+
+
       const courseData = await this._courseRepository.findCourseById(courseId);
       if(courseData){
         await this._userRepository.enrollCourse(userId, courseId);
@@ -405,33 +429,11 @@ export default class CourseService implements ICourseService {
           await this._enrolledRepository.createEnrolledCourse(enrollDetails);
 
         if (courseData?.courseType === "paid") {
-          const tutorRevenue =
-            parseInt(courseData?.price) * (TUTOR_COURSE_PERCENTAGE / 100);
-          const description = `Course Enrollment revenue from ${courseData?.title}`;
-          const transactionType = "Credited";
-
-          const tutorId = courseData?.tutor;
-          if(tutorId){
-            const existingWallet =
-              await this._walletRepository.findWalletByUser(tutorId);
-
-            if (!existingWallet) {
-              const walletData = {
-                userId: tutorId,
-              };
-              await this._walletRepository.createWallet(walletData);
-            }
-            const transactionsData = {
-              amount: tutorRevenue,
-              description,
-              transactionType,
-            };
-            await this._walletRepository.addTransctionToWallet(
-              tutorId,
-              transactionsData
-            );
-          }
+         this.handleTutorRevenue(courseData)
         }
+
+       await this._courseRepository.addEnrolledUserToCourse(courseId,userId);
+
         return enrolledCourse;
       } else {
         throw new Error("Course is not found")
@@ -443,11 +445,96 @@ export default class CourseService implements ICourseService {
 
   }
 
+  async handleTutorRevenue(courseData:ICourse){
+    try {
+       const tutorRevenue =
+         parseInt(courseData?.price) * (TUTOR_COURSE_PERCENTAGE / 100);
+       const description = `Course Enrollment revenue from ${courseData?.title}`;
+       const transactionType = "Credited";
+
+       const tutorId = courseData?.tutor;
+       if (tutorId) {
+         const existingWallet = await this._walletRepository.findWalletByUser(
+           tutorId
+         );
+
+         if (!existingWallet) {
+           const walletData = {
+             userId: tutorId,
+           };
+           await this._walletRepository.createWallet(walletData);
+         }
+         const transactionsData = {
+           amount: tutorRevenue,
+           description,
+           transactionType,
+         };
+         await this._walletRepository.addTransctionToWallet(
+           tutorId,
+           transactionsData
+         );
+       }
+      
+    } catch (error) {
+      throw error
+    }
+  }
+
   async getEnrolledCoursesForUser(userId: string): Promise<IEnrolledCourse[] | null> {
     try {
 
       return await this._enrolledRepository.getAllEnrolledCourseForUser(userId);
       
+    } catch (error) {
+      throw error
+    }
+  }
+
+  async cancelEnrolledCourse(userId:string , courseId: string): Promise<IEnrolledCourse | null >{
+    try {
+
+      await this._userRepository.removeCourseFromUser(userId,courseId);
+      const courseData = await this._courseRepository.findCourseById(courseId);
+      await this._courseRepository.removeUserFromCourse(courseId,userId)
+
+      if(courseData?.courseType === "paid"){
+        const tutorId = courseData?.tutor
+        if(tutorId){
+          const tutorRevenue =
+            parseInt(courseData?.price) * (TUTOR_COURSE_PERCENTAGE / 100);
+  
+          const description = `Course Revenue Debited due to cancelation of ${courseData.title}`;
+          const transactionType = "Debited"
+  
+          const transactionsData = {
+            amount: -tutorRevenue,
+            description,
+            transactionType
+          }
+  
+          await this._walletRepository.addTransctionToWallet(tutorId,transactionsData)
+        }
+
+        const existingWallet = await this._walletRepository.findWalletByUser(userId);
+        
+        if(!existingWallet){
+          const walletData = {
+            userId
+          }
+          await this._walletRepository.createWallet(walletData)
+        }
+
+        const courseAmount = parseInt(courseData.price);
+        const studentDescription = `${courseData.title}'s price refunded due to cancelation of course`;
+        const studentTransaction = "Credited" ;
+        const studentTransactionsData ={
+          amount: courseAmount,
+          description: studentDescription,
+          transactionType: studentTransaction
+        }
+        await this._walletRepository.addTransctionToWallet(userId, studentTransactionsData)      
+      }
+      return await this._enrolledRepository.updateEnrolledCourseStatus(userId,courseId,false)
     } catch (error) {
       throw error
     }

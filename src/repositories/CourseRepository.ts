@@ -114,7 +114,6 @@ export default class CourseRepository implements ICourseRepository {
 
   async deleteChapterFromCourse(courseId: string, chapterId: string): Promise<ICourse | null> {
     try {
-      console.log(chapterId);
       
       return await Course.findByIdAndUpdate(
         { _id:courseId },
@@ -122,6 +121,32 @@ export default class CourseRepository implements ICourseRepository {
         { new:true }
         )
       
+    } catch (error) {
+      throw error
+    }
+  }
+
+  async addEnrolledUserToCourse(courseId: string, userId: string): Promise<void> {
+    try {
+
+      await Course.findByIdAndUpdate(
+        courseId,
+        { $push: { enrolledStudents : userId } }
+      )
+      
+    } catch (error) {
+      throw error
+    }
+  }
+
+  async removeUserFromCourse(courseId: string, userId: string): Promise<void> {
+    try {
+
+     await Course.findByIdAndUpdate(courseId, {
+       $pull: { enrolledStudents: userId },
+     });
+      
+
     } catch (error) {
       throw error
     }

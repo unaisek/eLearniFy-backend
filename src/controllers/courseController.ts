@@ -147,9 +147,8 @@ export default class CourseController {
   async coursePayment(req: Request, res:Response, next:NextFunction){
     try {
 
-      const { courseId } = req.body
-      const sessionId=await this._courseService.createCheckoutSession(courseId);    
-      console.log(sessionId);
+      const { courseId ,userId } = req.body
+      const sessionId = await this._courseService.createCheckoutSession(courseId, userId);    
       
       res.status(200).json(sessionId)
 
@@ -220,6 +219,23 @@ export default class CourseController {
       res.status(200).json(enrolledCourses)
       
 
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  async cancelEnrolledCourse( req:Request, res: Response, next: NextFunction ){
+    try {
+
+      const { userId, courseId } = req.body;
+      const data = await this._courseService.cancelEnrolledCourse( userId, courseId )
+      console.log(data);
+      
+      if(data){
+        res.status(200).json(data)
+      }
+
+      
     } catch (error) {
       next(error)
     }
