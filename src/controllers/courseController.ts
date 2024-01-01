@@ -210,4 +210,18 @@ export default class CourseController {
       next(error)
     }
   }
+
+  async getEnrolledCoursesByUser(req: Request, res: Response, next:NextFunction){
+    try {
+      
+      const userId = req.params.userId
+      const enrolledCourses = await this._courseService.getEnrolledCoursesForUser(userId);
+      console.log(enrolledCourses);
+      res.status(200).json(enrolledCourses)
+      
+
+    } catch (error) {
+      next(error)
+    }
+  }
 }

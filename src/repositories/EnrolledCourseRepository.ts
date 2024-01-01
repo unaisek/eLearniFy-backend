@@ -22,4 +22,31 @@ export default class EnrolledCourseRepository implements IEnrolledCourseRepo{
             throw error
         }
     }
+
+    async getAllEnrolledCourseForUser(userId: string): Promise<IEnrolledCourse[] | null> {
+        try {
+
+            return await EnrolledCourse.find({ userId: userId }).populate({
+              path: "courseId",
+              model: "Course",
+              populate: [
+                {
+                  path: "category",
+                  model: "Category", 
+                },
+                {
+                  path: "chapters.chapter",
+                  model: "Chapter", 
+                },
+                {
+                  path: "tutor",
+                  model: "User",
+                },
+              ],
+            });
+            
+        } catch (error) {
+            throw error
+        }
+    }
 }

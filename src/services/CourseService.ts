@@ -442,4 +442,14 @@ export default class CourseService implements ICourseService {
     }
 
   }
+
+  async getEnrolledCoursesForUser(userId: string): Promise<IEnrolledCourse[] | null> {
+    try {
+
+      return await this._enrolledRepository.getAllEnrolledCourseForUser(userId);
+      
+    } catch (error) {
+      throw error
+    }
+  }
 }

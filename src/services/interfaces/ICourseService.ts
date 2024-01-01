@@ -39,6 +39,10 @@ export interface ICourseService {
 
   unlistCourse(courseId: string): Promise<ICourse | null>;
   listCourse(courseId: string): Promise<ICourse | null>;
-  deleteChapterFromCourse(courseId:string, chapterId:string): Promise <ICourse | null>;
-  enrollCourse(courseId: string, userId:string): Promise <IEnrolledCourse>;
+  deleteChapterFromCourse(
+    courseId: string,
+    chapterId: string
+  ): Promise<ICourse | null>;
+  enrollCourse(courseId: string, userId: string): Promise<IEnrolledCourse>;
+  getEnrolledCoursesForUser( userId: string ): Promise<IEnrolledCourse[] | null>
 }
