@@ -1,4 +1,6 @@
 import { Iuser } from "../models/User";
+import { IWallet } from "../models/Wallet";
+import WalletRepository from "../repositories/WalletRepository";
 import UserRepository from "../repositories/userRepository";
 import AwsS3Service from "./AwsService";
 import { IUserService } from "./interfaces/IUserService";
@@ -8,10 +10,12 @@ dotenv.config()
 export default class UserService implements IUserService {
   private _userRepository: UserRepository;
   private _awsService: AwsS3Service;
+  private _walletRepository: WalletRepository
 
   constructor() {
     this._userRepository = new UserRepository();
     this._awsService = new AwsS3Service();
+    this._walletRepository = new WalletRepository();
   }
 
   async getAllUsers(): Promise<Iuser[]> {
@@ -73,5 +77,14 @@ export default class UserService implements IUserService {
         
       }
     } catch (error) {}
+  }
+  async getWalletData(userId: string): Promise<IWallet | null> {
+    try {
+
+      return await this._walletRepository.findWalletByUser(userId)
+      
+    } catch (error) {
+      throw error
+    }
   }
 }

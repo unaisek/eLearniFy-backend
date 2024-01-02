@@ -215,7 +215,6 @@ export default class CourseController {
       
       const userId = req.params.userId
       const enrolledCourses = await this._courseService.getEnrolledCoursesForUser(userId);
-      console.log(enrolledCourses);
       res.status(200).json(enrolledCourses)
       
 

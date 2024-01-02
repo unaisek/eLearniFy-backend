@@ -14,7 +14,8 @@ router.post("/enroll-course",courseController.enrollCourse.bind(courseController
 router.get('/profile/:id',userConstroller.getUserData.bind(userConstroller));
 router.post('/upload-profile',upload.any(),userConstroller.uploadProfileImage.bind(userConstroller));
 router.get('/my-courses/:userId',courseController.getEnrolledCoursesByUser.bind(courseController));
-router.post('/cancel-course',courseController.cancelEnrolledCourse.bind(courseController))
+router.post('/cancel-course',courseController.cancelEnrolledCourse.bind(courseController));
+router.get('/wallet/:userId',userConstroller.getWalletData.bind(userConstroller))
 
 
 export default router;

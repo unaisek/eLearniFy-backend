@@ -21,6 +21,7 @@ router.put('/upload-profile',upload.any(),userController.uploadProfileImage.bind
 router.put('/unlist-course/:courseId',courseController.unlistCourse.bind(courseController));
 router.put('/list-course/:courseId',courseController.listCourse.bind(courseController));
 router.put("/delete-chapter",courseController.deleteChapter.bind(courseController));
+router.get('/wallet/:userId',userController.getWalletData.bind(userController));
 
 
 

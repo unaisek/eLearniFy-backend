@@ -447,8 +447,9 @@ export default class CourseService implements ICourseService {
 
   async handleTutorRevenue(courseData:ICourse){
     try {
-       const tutorRevenue =
-         parseInt(courseData?.price) * (TUTOR_COURSE_PERCENTAGE / 100);
+       const tutorRevenue = Math.round(
+         parseInt(courseData?.price) * (TUTOR_COURSE_PERCENTAGE / 100)
+       );
        const description = `Course Enrollment revenue from ${courseData?.title}`;
        const transactionType = "Credited";
 

@@ -74,4 +74,18 @@ export default class UserController{
             next(error)
         }
     }
+
+    async getWalletData(req:Request, res:Response, next:NextFunction){
+        try {
+            const userId = req.params.userId;           
+            const walletData = await this._userService.getWalletData(userId);            
+            if(walletData){
+                res.status(200).json(walletData)
+            }
+            
+            
+        } catch (error) {
+            next(error)
+        }
+    }
 }
