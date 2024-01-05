@@ -69,4 +69,44 @@ export default class EnrolledCourseRepository implements IEnrolledCourseRepo {
       throw error;
     }
   }
+
+  async getEnrolledCourseData(userId: string, courseId: string): Promise<IEnrolledCourse |null> {
+    try {
+
+      return await EnrolledCourse.findOne({ userId, courseId }).populate({
+        path: "courseId",
+        model: "Course",
+        populate: [
+          {
+            path: "category",
+            model: "Category",
+          },
+          {
+            path: "chapters.chapter",
+            model: "Chapter",
+          },
+          {
+            path: "tutor",
+            model: "User",
+          },
+        ],
+      });
+    } catch (error) {
+      throw error
+    }
+  }
+
+  async updateCourseProgression(userId: string, courseId: string, chapterId: string): Promise<IEnrolledCourse | null> {
+    try {
+
+      return await EnrolledCourse.findOneAndUpdate(
+        {userId, courseId},
+        { $push: { progression : chapterId } },
+        { new:true }
+      )
+      
+    } catch (error) {
+      throw error
+    }
+  }
 }

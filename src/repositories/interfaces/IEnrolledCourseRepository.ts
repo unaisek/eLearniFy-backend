@@ -1,3 +1,4 @@
+import { String } from "aws-sdk/clients/cloudwatchevents";
 import { IEnrolledCourse } from "../../models/EnrolledCourse";
 
 export interface IEnrolledCourseRepo {
@@ -16,4 +17,7 @@ export interface IEnrolledCourseRepo {
     courseId: string,
     status: boolean
   ): Promise<IEnrolledCourse | null>;
+
+  getEnrolledCourseData(userId:string,courseId:string):Promise<IEnrolledCourse | null>;
+  updateCourseProgression(userId: string, courseId: string, chapterId: string): Promise<IEnrolledCourse | null >;
 }

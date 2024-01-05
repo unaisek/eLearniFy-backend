@@ -501,8 +501,9 @@ export default class CourseService implements ICourseService {
       if(courseData?.courseType === "paid"){
         const tutorId = courseData?.tutor
         if(tutorId){
-          const tutorRevenue =
-            parseInt(courseData?.price) * (TUTOR_COURSE_PERCENTAGE / 100);
+          const tutorRevenue = Math.round(
+            parseInt(courseData?.price) * (TUTOR_COURSE_PERCENTAGE / 100)
+          );
   
           const description = `Course Revenue Debited due to cancelation of ${courseData.title}`;
           const transactionType = "Debited"
@@ -540,4 +541,25 @@ export default class CourseService implements ICourseService {
       throw error
     }
   }
+
+  async getEnrolledCourseData(courseId: string, userId: string): Promise<IEnrolledCourse | null> {
+    try {
+
+      return await this._enrolledRepository.getEnrolledCourseData(userId,courseId)
+      
+    } catch (error) {
+      throw error
+    }
+  }
+
+  async updateCourseProgression(userId: string, courseId: string, chapterId: string): Promise<IEnrolledCourse | null> {
+    try {
+
+      return await this._enrolledRepository.updateCourseProgression(userId, courseId, chapterId);
+      
+    } catch (error) {
+      throw error
+    }
+  }
+
 }

@@ -43,7 +43,15 @@ export interface ICourseService {
     courseId: string,
     chapterId: string
   ): Promise<ICourse | null>;
-  enrollCourse(courseId: string, userId: string): Promise<IEnrolledCourse | null >;
+  enrollCourse(
+    courseId: string,
+    userId: string
+  ): Promise<IEnrolledCourse | null>;
   getEnrolledCoursesForUser(userId: string): Promise<IEnrolledCourse[] | null>;
-  cancelEnrolledCourse(userId: string, courseId: string): Promise <IEnrolledCourse | null >
+  cancelEnrolledCourse(
+    userId: string,
+    courseId: string
+  ): Promise<IEnrolledCourse | null>;
+  getEnrolledCourseData(courseId:string, userId: string): Promise<IEnrolledCourse | null>;
+  updateCourseProgression(userId: string, courseId: string, chapterId:string): Promise<IEnrolledCourse | null>;
 }

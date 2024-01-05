@@ -144,96 +144,126 @@ export default class CourseController {
 
   // stripe Payment
 
-  async coursePayment(req: Request, res:Response, next:NextFunction){
+  async coursePayment(req: Request, res: Response, next: NextFunction) {
     try {
+      const { courseId, userId } = req.body;
+      const sessionId = await this._courseService.createCheckoutSession(
+        courseId,
+        userId
+      );
 
-      const { courseId ,userId } = req.body
-      const sessionId = await this._courseService.createCheckoutSession(courseId, userId);    
-      
-      res.status(200).json(sessionId)
-
-      
-      
+      res.status(200).json(sessionId);
     } catch (error) {
-      next(error)
+      next(error);
     }
   }
 
-  async unlistCourse(req:Request, res:Response,next:NextFunction){
+  async unlistCourse(req: Request, res: Response, next: NextFunction) {
     try {
-
       const courseId = req.params.courseId;
-      const courseData = await this._courseService.unlistCourse(courseId)
-      res.status(200).json(courseData)
-      
+      const courseData = await this._courseService.unlistCourse(courseId);
+      res.status(200).json(courseData);
     } catch (error) {
-      next(error)
+      next(error);
     }
   }
 
-  async listCourse(req: Request, res: Response, next: NextFunction){
+  async listCourse(req: Request, res: Response, next: NextFunction) {
     try {
       const courseId = req.params.courseId;
       const courseData = await this._courseService.listCourse(courseId);
-      if(courseData){
-        res.status(200).json(courseData)
+      if (courseData) {
+        res.status(200).json(courseData);
       }
-      
     } catch (error) {
-      next(error)
+      next(error);
     }
   }
 
-  async deleteChapter(req:Request, res:Response, next:NextFunction){
+  async deleteChapter(req: Request, res: Response, next: NextFunction) {
     try {
-      const {courseId,chapterId} = req.body;
-      const updatedData = await this._courseService.deleteChapterFromCourse(courseId,chapterId); 
-      if(updatedData){
-        res.status(200).json(updatedData)
+      const { courseId, chapterId } = req.body;
+      const updatedData = await this._courseService.deleteChapterFromCourse(
+        courseId,
+        chapterId
+      );
+      if (updatedData) {
+        res.status(200).json(updatedData);
       }
-            
     } catch (error) {
-      next(error)
+      next(error);
     }
   }
 
-  async enrollCourse(req:Request, res:Response, next:NextFunction){
+  async enrollCourse(req: Request, res: Response, next: NextFunction) {
     try {
-      const { userId, courseId } = req.body;     
-      const enrolledData = await this._courseService.enrollCourse(courseId,userId);
+      const { userId, courseId } = req.body;
+      const enrolledData = await this._courseService.enrollCourse(
+        courseId,
+        userId
+      );
+      if (enrolledData) {
+        res.status(200).json(enrolledData);
+      }
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async getEnrolledCoursesByUser(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    try {
+      const userId = req.params.userId;
+      const enrolledCourses =
+        await this._courseService.getEnrolledCoursesForUser(userId);
+      res.status(200).json(enrolledCourses);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async cancelEnrolledCourse(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { userId, courseId } = req.body;
+      const data = await this._courseService.cancelEnrolledCourse(
+        userId,
+        courseId
+      );
+      console.log(data);
+
+      if (data) {
+        res.status(200).json(data);
+      }
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async getEnrolledCourseData(req: Request, res: Response, next: NextFunction) {
+    try {
+      const courseId = req.query.courseId as string;
+      const userId = req.query.userId as string;
+      const enrolledData = await this._courseService.getEnrolledCourseData(courseId,userId);
       if(enrolledData){
         res.status(200).json(enrolledData)
       }
-      
     } catch (error) {
-      next(error)
+      next(error);
     }
   }
 
-  async getEnrolledCoursesByUser(req: Request, res: Response, next:NextFunction){
-    try {
-      
-      const userId = req.params.userId
-      const enrolledCourses = await this._courseService.getEnrolledCoursesForUser(userId);
-      res.status(200).json(enrolledCourses)
-      
-
-    } catch (error) {
-      next(error)
-    }
-  }
-
-  async cancelEnrolledCourse( req:Request, res: Response, next: NextFunction ){
+  async updateCourseProgression(req:Request, res: Response, next: NextFunction){
     try {
 
-      const { userId, courseId } = req.body;
-      const data = await this._courseService.cancelEnrolledCourse( userId, courseId )
-      console.log(data);
+      const { userId, courseId, chapterId } = req.body;
+      const updateData = await this._courseService.updateCourseProgression(userId, courseId, chapterId);
       
-      if(data){
-        res.status(200).json(data)
+      if(updateData){
+        res.status(200).json(updateData)
       }
-
       
     } catch (error) {
       next(error)
