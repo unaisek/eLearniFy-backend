@@ -17,7 +17,11 @@ router.get('/my-courses/:userId',courseController.getEnrolledCoursesByUser.bind(
 router.post('/cancel-course',courseController.cancelEnrolledCourse.bind(courseController));
 router.get('/wallet/:userId',userConstroller.getWalletData.bind(userConstroller));
 router.get('/enrolled-course',courseController.getEnrolledCourseData.bind(courseController));
-router.put('/update-progression',courseController.updateCourseProgression.bind(courseController))
+router.put('/update-progression',courseController.updateCourseProgression.bind(courseController));
+
+router.post('/add-review',courseController.addReviewForCourse.bind(courseController));
+router.get('/review/:courseId',courseController.getAllReviewsOfCourse.bind(courseController));
+// router.post('/add-rating',courseController.addRatingForCourse.bind(courseController))
 
 
 export default router;

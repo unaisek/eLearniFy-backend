@@ -64,7 +64,7 @@ export default class UserService implements IUserService {
         let profileImageUrl: string | undefined;
         const profileImageParams: AWS.S3.PutObjectRequest = {
           Bucket: process.env.AWS_S3_BUCKET_NAME!,
-          Key: `profileImages/${user?.name}`,
+          Key: `profileImages/${user?.name}/${profileImage.originalname}`,
           Body: profileImage.buffer,
           ACL: "public-read",
           ContentType: profileImage.mimetype,

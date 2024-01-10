@@ -232,7 +232,7 @@ export default class CourseController {
         userId,
         courseId
       );
-      console.log(data);
+  
 
       if (data) {
         res.status(200).json(data);
@@ -246,27 +246,83 @@ export default class CourseController {
     try {
       const courseId = req.query.courseId as string;
       const userId = req.query.userId as string;
-      const enrolledData = await this._courseService.getEnrolledCourseData(courseId,userId);
-      if(enrolledData){
-        res.status(200).json(enrolledData)
+      const enrolledData = await this._courseService.getEnrolledCourseData(
+        courseId,
+        userId
+      );
+      if (enrolledData) {
+        res.status(200).json(enrolledData);
       }
     } catch (error) {
       next(error);
     }
   }
 
-  async updateCourseProgression(req:Request, res: Response, next: NextFunction){
+  async updateCourseProgression(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    try {
+      const { userId, courseId, chapterId } = req.body;
+      const updateData = await this._courseService.updateCourseProgression(
+        userId,
+        courseId,
+        chapterId
+      );
+
+      if (updateData) {
+        res.status(200).json(updateData);
+      }
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async addReviewForCourse(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { courseId, userId, review } = req.body;
+                   
+      const data = await this._courseService.addReviewForCourse(
+        courseId,
+        userId,
+        review
+      );
+
+      if (data) {
+        res.status(200).json(data);
+      }
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async getAllReviewsOfCourse(req: Request, res: Response, next: NextFunction){
     try {
 
-      const { userId, courseId, chapterId } = req.body;
-      const updateData = await this._courseService.updateCourseProgression(userId, courseId, chapterId);
-      
-      if(updateData){
-        res.status(200).json(updateData)
-      }
+      const courseId = req.params.courseId;
+      const reviewData = await this._courseService.getAllReviewsOfCourse(courseId);
+      if(reviewData){
+        res.status(200).json(reviewData)
+      }     
       
     } catch (error) {
       next(error)
     }
   }
+
+  // async addRatingForCourse(req: Request, res:Response, next:NextFunction){
+  //   try {
+
+  //     const { courseId, userId, rating } = req.body
+  //     const data = await this._courseService.addRatingForCourse(courseId,userId,rating);
+  //     if(data){
+  //       res.status(200).json(data)
+  //     }
+      
+      
+  //   } catch (error) {
+  //     throw error
+  //   }
+  // }
 }

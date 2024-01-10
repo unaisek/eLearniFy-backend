@@ -1,6 +1,6 @@
 import AwsS3Service from "./AwsService";
 import { ICourseService } from "./interfaces/ICourseService";
-import { Request } from 'express';
+import e, { Request } from 'express';
 import dotenv from 'dotenv';
 import CourseRepository from "../repositories/CourseRepository";
 import { ICourse } from "../models/Course";
@@ -12,6 +12,8 @@ import { IEnrolledCourse } from "../models/EnrolledCourse";
 import UserRepository from "../repositories/userRepository";
 import WalletRepository from "../repositories/WalletRepository";
 import { error } from "console";
+import { IReview } from "../models/Review";
+import ReviewRepository from "../repositories/ReviewRepository";
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
 dotenv.config();
 const TUTOR_COURSE_PERCENTAGE = 70;
@@ -25,12 +27,15 @@ export default class CourseService implements ICourseService {
   private _enrolledRepository: EnrolledCourseRepository;
   private _userRepository:UserRepository;
   private _walletRepository: WalletRepository;
+  private _reviewRepository: ReviewRepository;
+
   constructor() {
     this._awsService = new AwsS3Service();
     this._courseRepository = new CourseRepository();
     this._enrolledRepository = new EnrolledCourseRepository();
     this._userRepository = new UserRepository();
     this._walletRepository = new WalletRepository();
+    this._reviewRepository = new ReviewRepository();
   }
   async addNewCourse(req: Request): Promise<Partial<ICourse> | null> {
     try {
@@ -561,5 +566,55 @@ export default class CourseService implements ICourseService {
       throw error
     }
   }
+
+  async addReviewForCourse(courseId: string, userId: string, review: IReview): Promise<IReview | null> {
+    
+    try {
+
+      const existingReview = await this._reviewRepository.checkExistingReview(courseId,userId);
+      
+      if(existingReview){
+       throw new Error("alradey reviewd")
+      }
+      const data: IReview = {
+        courseId,
+        userId,
+        review: review.review,
+        rating: review.rating,
+      };
+      return await this._reviewRepository.createReview(data);
+
+    } catch (error) {
+      throw error
+    }
+  }
+
+  async getAllReviewsOfCourse(courseId: string): Promise<IReview[] | null> {
+
+    try {
+      return await this._reviewRepository.getAllReviewsOfCourse(courseId);
+
+    } catch (error) {
+      throw error
+    }
+  }
+
+  // async addRatingForCourse(courseId: string, userId: string, rating: number): Promise<IReview | null> {
+  //   try {
+  //     const existingReview = await this._reviewRepository.checkExistingReview(courseId,userId);
+  //     if(!existingReview) {
+  //        const data = {
+  //          courseId,
+  //          userId,
+  //        };
+  //       await this._reviewRepository.createReview(data);
+  //     }
+
+  //     return await this._reviewRepository.addRatingForCourse(courseId, userId, rating)
+
+  //   } catch (error) {
+  //     throw error
+  //   }
+  // }
 
 }

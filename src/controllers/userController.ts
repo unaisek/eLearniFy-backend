@@ -59,12 +59,8 @@ export default class UserController{
     async uploadProfileImage(req:Request, res:Response, next:NextFunction){
         try {           
             const file = req.files as Express.Multer.File[];
-            const { userId } = req.body;
-            console.log(userId);
-            
-
+            const { userId } = req.body;           
             const result = await this._userService.uploadProfileImage(file,userId);
-            console.log(result);
             
             if(result){
                 res.status(200).json(result)
