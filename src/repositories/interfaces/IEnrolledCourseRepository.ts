@@ -18,6 +18,18 @@ export interface IEnrolledCourseRepo {
     status: boolean
   ): Promise<IEnrolledCourse | null>;
 
-  getEnrolledCourseData(userId:string,courseId:string):Promise<IEnrolledCourse | null>;
-  updateCourseProgression(userId: string, courseId: string, chapterId: string): Promise<IEnrolledCourse | null >;
+  getEnrolledCourseData(
+    userId: string,
+    courseId: string
+  ): Promise<IEnrolledCourse | null>;
+  updateCourseProgression(
+    userId: string,
+    courseId: string,
+    chapterId: string
+  ): Promise<IEnrolledCourse | null>;
+
+  getTotalRevenue(): Promise<number>;
+
+  getWeeklyRevenue(): Promise<number[]>;
+  getCurrentMonthRevenue(): Promise<number>;
 }

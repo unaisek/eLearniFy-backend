@@ -145,7 +145,10 @@ export default class AuthController {
       const { email, password } = req.body;
 
       const token = await this._authService.adminLogin(email, password);
-      res.status(200).json(token);
+      if(token){
+        res.status(200).json(token);
+
+      }
     } catch (error) {
       let statusCode = 404;
       let errorMessge = "Unauthorized user";
@@ -158,7 +161,7 @@ export default class AuthController {
         errorMessge = "Incorrect password";
       }
 
-      res.json(statusCode).json({ message: errorMessge });
+      res.status(statusCode).json({ message: errorMessge });
     }
   }
 }

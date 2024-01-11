@@ -27,5 +27,7 @@ export interface ICourseRepository {
     chapterId: string
   ): Promise<ICourse | null>;
   addEnrolledUserToCourse(courseId: string, userId: string): Promise<void>;
-  removeUserFromCourse(courseId: string, userId: string) :Promise <void>
+  removeUserFromCourse(courseId: string, userId: string): Promise<void>;
+  getCourseCount(): Promise<number>;
+  getPaidAndFreeCourseCount(): Promise<number[]>;
 }

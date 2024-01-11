@@ -18,7 +18,7 @@ export default class CourseRepository implements ICourseRepository {
 
   async addChapterToCourse(
     courseId: string,
-    chapter: { chapter:string, order: number }
+    chapter: { chapter: string; order: number }
   ): Promise<ICourse | null> {
     try {
       const course = await Course.findById(courseId);
@@ -34,7 +34,9 @@ export default class CourseRepository implements ICourseRepository {
 
   async getAllCourses(tutorId: string): Promise<ICourse[] | null> {
     try {
-      return await Course.find({ tutor: tutorId }).populate('tutor').populate('category')
+      return await Course.find({ tutor: tutorId })
+        .populate("tutor")
+        .populate("category");
     } catch (error) {
       return null;
     }
@@ -42,113 +44,124 @@ export default class CourseRepository implements ICourseRepository {
 
   async findCourseById(courseId: string): Promise<ICourse | null> {
     try {
-
-      return await Course.findById(courseId).populate('tutor').populate('category').populate('chapters.chapter');
-      
+      return await Course.findById(courseId)
+        .populate("tutor")
+        .populate("category")
+        .populate("chapters.chapter");
     } catch (error) {
-      return null
+      return null;
     }
   }
 
-  async updateCourse(courseId: string, updatedData: Partial<ICourse>): Promise<ICourse |null> {
+  async updateCourse(
+    courseId: string,
+    updatedData: Partial<ICourse>
+  ): Promise<ICourse | null> {
     try {
-      
-      return await Course.findByIdAndUpdate(courseId,updatedData)
-      
+      return await Course.findByIdAndUpdate(courseId, updatedData);
     } catch (error) {
-      return null
+      return null;
     }
-    
   }
 
-  async updateChapter(chapterId: string, chapterData: Partial<IChapter>): Promise<IChapter | null> {
+  async updateChapter(
+    chapterId: string,
+    chapterData: Partial<IChapter>
+  ): Promise<IChapter | null> {
     try {
-      
-      return await Chapter.findByIdAndUpdate(chapterId,chapterData)
-
+      return await Chapter.findByIdAndUpdate(chapterId, chapterData);
     } catch (error) {
-      return null
+      return null;
     }
   }
 
   async getCoursesForStudents(): Promise<ICourse[] | null> {
     try {
-
-      return await Course.find({status:true}).populate('tutor').populate('category').populate('chapters.chapter');
-      
+      return await Course.find({ status: true })
+        .populate("tutor")
+        .populate("category")
+        .populate("chapters.chapter");
     } catch (error) {
-      return null
+      return null;
     }
-    
   }
 
   async unlistCourse(courseId: string): Promise<ICourse | null> {
     try {
-
-       return await Course.findByIdAndUpdate(
-         courseId,
-         { status: false },
-         { new: true }
-       );
-      
+      return await Course.findByIdAndUpdate(
+        courseId,
+        { status: false },
+        { new: true }
+      );
     } catch (error) {
-      
-      return null
+      return null;
     }
-   
   }
 
   async listCourse(courseId: string): Promise<ICourse | null> {
     try {
-       return await Course.findByIdAndUpdate(
-         courseId,
-         { status: true },
-         { new: true }
-       );
-      
-    } catch (error) {
-      return null
-    }
-
-  }
-
-  async deleteChapterFromCourse(courseId: string, chapterId: string): Promise<ICourse | null> {
-    try {
-      
       return await Course.findByIdAndUpdate(
-        { _id:courseId },
-        { $pull: { chapters: { _id : chapterId } } },
-        { new:true }
-        )
-      
+        courseId,
+        { status: true },
+        { new: true }
+      );
     } catch (error) {
-      throw error
+      return null;
     }
   }
 
-  async addEnrolledUserToCourse(courseId: string, userId: string): Promise<void> {
+  async deleteChapterFromCourse(
+    courseId: string,
+    chapterId: string
+  ): Promise<ICourse | null> {
     try {
-
-      await Course.findByIdAndUpdate(
-        courseId,
-        { $push: { enrolledStudents : userId } }
-      )
-      
+      return await Course.findByIdAndUpdate(
+        { _id: courseId },
+        { $pull: { chapters: { _id: chapterId } } },
+        { new: true }
+      );
     } catch (error) {
-      throw error
+      throw error;
+    }
+  }
+
+  async addEnrolledUserToCourse(
+    courseId: string,
+    userId: string
+  ): Promise<void> {
+    try {
+      await Course.findByIdAndUpdate(courseId, {
+        $push: { enrolledStudents: userId },
+      });
+    } catch (error) {
+      throw error;
     }
   }
 
   async removeUserFromCourse(courseId: string, userId: string): Promise<void> {
     try {
-
-     await Course.findByIdAndUpdate(courseId, {
-       $pull: { enrolledStudents: userId },
-     });
-      
-
+      await Course.findByIdAndUpdate(courseId, {
+        $pull: { enrolledStudents: userId },
+      });
     } catch (error) {
-      throw error
+      throw error;
     }
+  }
+
+  async getCourseCount(): Promise<number> {
+    try {
+      const courseCount = await Course.countDocuments({ status: true });
+      return courseCount;
+    } catch (error) {
+      throw error;
+    }
+  }
+  async getPaidAndFreeCourseCount(): Promise<number[]> {
+    const paidCourseCount = await Course.countDocuments({status:true, courseType:"paid"});
+    const freeCourseCount = await Course.countDocuments({status:true, courseType:"free"});
+    
+    const paidAndFreeCourse = [ paidCourseCount, freeCourseCount ];
+    return paidAndFreeCourse;
+    
   }
 }

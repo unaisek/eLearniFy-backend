@@ -83,4 +83,33 @@ export default class UserRepository implements IUserRepository{
         }
     }
 
+    async getTotalUsersCount(): Promise<number> {
+        
+        const usersCount = await User.countDocuments({})
+        return usersCount
+        
+    }
+
+    async getStudentCount(): Promise<number> {
+        try {
+
+            const studentCount = await User.countDocuments({role:"student"});
+            return studentCount
+            
+            
+        } catch (error) {
+            throw error
+        }
+    }
+
+    async getTutorCount(): Promise<number> {
+        try {
+
+            const tutorCount = await User.countDocuments({role:"tutor"})
+            return tutorCount
+        } catch (error) {
+            throw error
+        }
+    }
+
 }
