@@ -32,4 +32,7 @@ export interface IEnrolledCourseRepo {
 
   getWeeklyRevenue(): Promise<number[]>;
   getCurrentMonthRevenue(): Promise<number>;
+  getTotalRevenueOfTutor(tutorId: string): Promise<number>;
+  getCurrentMonthRevenueForTutor(tutorId: string): Promise<number>;
+  getThreeDaysRevenueOfTutor(tutorId: string): Promise<number[]>
 }

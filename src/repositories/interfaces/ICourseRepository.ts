@@ -30,4 +30,8 @@ export interface ICourseRepository {
   removeUserFromCourse(courseId: string, userId: string): Promise<void>;
   getCourseCount(): Promise<number>;
   getPaidAndFreeCourseCount(): Promise<number[]>;
+  getTutorCourseCount(tutorId: string): Promise<number>;
+  getEnrolledStudentCountOfTuor(tutorId: string): Promise<number>;
+  getPaidCourseCountOfTutor(tutorId: string): Promise<number>;
+  getFreeCourseCountOfTutor(tutorId: string): Promise<number>;
 }

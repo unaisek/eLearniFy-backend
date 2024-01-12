@@ -1,4 +1,4 @@
-import { Schema } from "mongoose";
+import mongoose, { Schema } from "mongoose";
 import Chapter, { IChapter } from "../models/Chapter";
 import Course,{ ICourse} from "../models/Course";
 import { ICourseRepository } from "./interfaces/ICourseRepository";
@@ -163,5 +163,67 @@ export default class CourseRepository implements ICourseRepository {
     const paidAndFreeCourse = [ paidCourseCount, freeCourseCount ];
     return paidAndFreeCourse;
     
+  }
+
+  async getTutorCourseCount(tutorId: string): Promise<number> {
+    
+    try {
+
+      return await Course.countDocuments({tutor:tutorId})
+      
+    } catch (error) {
+      throw error
+    }
+  }
+
+  async getEnrolledStudentCountOfTuor(tutorId: string): Promise<number> {
+    try {
+
+      const enrolledStudentCount = await Course.aggregate([
+        {
+          $match: {
+            status: true,
+            tutor: new mongoose.Types.ObjectId(tutorId),
+          },
+        },
+        {
+          $project: {
+            studentCount: { $size: "$enrolledStudents" },
+          },
+        },
+        {
+          $group:{
+            _id:null,
+            totalEnrolledStudent: {$sum:"$studentCount" }
+          }
+        }
+      ]);
+      
+       return enrolledStudentCount.length > 0 ? enrolledStudentCount[0].totalEnrolledStudent : 0
+      
+    } catch (error) {
+      throw error
+    }
+  }
+
+  async getPaidCourseCountOfTutor(tutorId: string): Promise<number> {
+    try {
+
+      return await Course.countDocuments({ status:true, courseType:"paid",tutor:tutorId });
+      
+    } catch (error) {
+      throw error
+    }
+  }
+
+
+  async getFreeCourseCountOfTutor(tutorId: string): Promise<number> {
+    try {
+
+      return await Course.countDocuments({ status:true, courseType:"free",tutor:tutorId });
+      
+    } catch (error) {
+      throw error
+    }
   }
 }
