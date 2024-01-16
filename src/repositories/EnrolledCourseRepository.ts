@@ -377,7 +377,7 @@ export default class EnrolledCourseRepository implements IEnrolledCourseRepo {
         {
           $project: {
             createdAt: 1,
-            price: { $toDouble: "$price" },
+            price: { $multiply: [{ $toDouble: "$price" }, 0.7] },
           },
         },
         {
@@ -406,7 +406,7 @@ export default class EnrolledCourseRepository implements IEnrolledCourseRepo {
         const existingInterval = threeDaysIntervalRevenue.find(
           (entry) => entry._id === interval
         );
-        return existingInterval ? existingInterval.intervalRevenue : 0;
+        return existingInterval ? Math.round(existingInterval.intervalRevenue) : 0;
       });
 
       const sorted = threeDaysIntervalRevenueOfMonth.reverse()

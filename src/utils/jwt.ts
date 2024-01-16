@@ -11,7 +11,3 @@ export function generateAuthToken(user:Iuser):string{
 
     return token;
 }
-
-export function jwtVerify(token:string, secret: string){
-    return jwt.verify(token, secret)
-}

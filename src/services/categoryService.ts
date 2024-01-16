@@ -14,7 +14,7 @@ export default class CatogoryService implements ICategoryService{
         try {            
             return await  this._categoryRepository.createCategory(category);            
         } catch (error) {
-            throw Error
+            throw error
         }
     }
 
@@ -24,7 +24,7 @@ export default class CatogoryService implements ICategoryService{
             return await this._categoryRepository.getCatergories();
             
         } catch (error) {
-            throw Error
+            throw error
         }
     }
 }

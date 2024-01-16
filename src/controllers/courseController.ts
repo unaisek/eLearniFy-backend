@@ -108,6 +108,8 @@ export default class CourseController {
       const courseId = req.params.courseId;
 
       const files = req.files as Express.Multer.File[];
+      console.log(files);
+      
       const { courseTitle } = req.body;
 
       const courseData = await this._courseService.getCourseDetails(courseId);

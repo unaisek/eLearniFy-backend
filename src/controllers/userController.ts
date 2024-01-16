@@ -22,7 +22,9 @@ export default class UserController{
     async blockUser(req: Request, res: Response, next:NextFunction){
         try {
 
-            const userId = req.params.id;
+            const {userId} = req.body
+            console.log(userId);
+            
             await this._userService.blockUser(userId);
             res.status(200).json({
                 message:"User is Blocked"
@@ -34,7 +36,7 @@ export default class UserController{
     }
 
     async UnBlockUser(req: Request, res: Response, next: NextFunction){
-        const userId = req.params.id;
+        const {userId} = req.body
         await this._userService.unBlockUser(userId);
         res.status(200).json({
             message:"User is Unblocked"

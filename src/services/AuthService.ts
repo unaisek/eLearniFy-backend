@@ -6,6 +6,8 @@ import { generateAuthToken } from "../utils/jwt";
 import { IAuthService } from "./interfaces/IAuthService";
 import { IOtp } from "../models/otpModel";
 import OtpRepository from "../repositories/OtpRepository";
+import NotFoundError from "../common/errors/notFoundError";
+import BadRequestError from "../common/errors/badRequestError";
 
 export  default class AuthService implements IAuthService{
     private _authRepository: AuthRepository;
@@ -82,12 +84,12 @@ export  default class AuthService implements IAuthService{
             const adminData = await this._authRepository.findAdminByEmail(email);
 
             if(!adminData){
-                throw new Error("Admin not found")
+                throw new NotFoundError("Email not found")
             } 
 
             const passwordMatch = await bcrypt.compare(password,adminData.password);
             if(!passwordMatch){
-                throw new Error("Incorrect password")
+                throw new BadRequestError("Password is incorrect")
             }
 
             const token = generateAuthToken(adminData);

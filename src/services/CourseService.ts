@@ -4,7 +4,6 @@ import e, { Request } from 'express';
 import dotenv from 'dotenv';
 import CourseRepository from "../repositories/CourseRepository";
 import { ICourse } from "../models/Course";
-import { title } from "process";
 import { IChapter } from "../models/Chapter";
 import Stripe from "stripe";
 import EnrolledCourseRepository from "../repositories/EnrolledCourseRepository";
@@ -14,8 +13,10 @@ import WalletRepository from "../repositories/WalletRepository";
 import { error } from "console";
 import { IReview } from "../models/Review";
 import ReviewRepository from "../repositories/ReviewRepository";
+import BadRequestError from "../common/errors/badRequestError";
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
 dotenv.config();
+
 const TUTOR_COURSE_PERCENTAGE = 70;
 // interface customRequest extends Request  {
 //     File?.Express.Multer.File[]
@@ -160,9 +161,8 @@ export default class CourseService implements ICourseService {
         order,
       });
     } catch (error) {
-      console.log(error,"create chapter error");
       
-      throw Error;
+      throw error;
     }
   }
 
@@ -179,7 +179,7 @@ export default class CourseService implements ICourseService {
     try {
       return await this._courseRepository.findCourseById(id);
     } catch (error) {
-      throw Error;
+      throw new BadRequestError("Course adding failed")
     }
   }
 
@@ -335,10 +335,13 @@ export default class CourseService implements ICourseService {
       const checkenrolled = await this._enrolledRepository.checkEnrolledCourse(userId,courseId);
       if(checkenrolled){
         if(checkenrolled?.status == true){
-          throw new Error("Course already enrolled")
+          throw new BadRequestError("Course already enrolled")
         }
       }
       const course = await this._courseRepository.findCourseById(courseId);
+      if(!course){
+        throw new BadRequestError("Course not found")
+      }
       const session = await stripe.checkout.sessions.create({
         payment_method_types: ["card"],
         mode: "payment",
@@ -371,7 +374,7 @@ export default class CourseService implements ICourseService {
       return await this._courseRepository.unlistCourse(courseId)
       
     } catch (error) {
-      throw error
+      throw new BadRequestError("Error in unlisting course")
     }
   }
 
@@ -416,7 +419,7 @@ export default class CourseService implements ICourseService {
           }
           return enrolledData
         } else {
-          throw new Error("Course Already enrolled")
+          throw new BadRequestError("Course already enrolled")
         }
       }
 
@@ -441,7 +444,7 @@ export default class CourseService implements ICourseService {
 
         return enrolledCourse;
       } else {
-        throw new Error("Course is not found")
+        throw new BadRequestError("Course not found")
       }
       
     } catch (error) {
@@ -574,7 +577,7 @@ export default class CourseService implements ICourseService {
       const existingReview = await this._reviewRepository.checkExistingReview(courseId,userId);
       
       if(existingReview){
-       throw new Error("alradey reviewd")
+       throw new BadRequestError("Already reviewed")
       }
       const data: IReview = {
         courseId,

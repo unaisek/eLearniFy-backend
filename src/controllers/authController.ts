@@ -3,7 +3,7 @@ import bcypt from 'bcrypt';
 import AuthService from "../services/AuthService";
 import { sendMail } from "../utils/mail";
 import { log } from "console";
-import { generateAuthToken, jwtVerify } from "../utils/jwt";
+import { generateAuthToken } from "../utils/jwt";
 
 export default class AuthController {
   private _authService: AuthService;

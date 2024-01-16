@@ -46,7 +46,7 @@ export default class UserService implements IUserService {
     try {
       return await this._userRepository.findUserById(userId);
     } catch (error) {
-      throw Error;
+      throw error;
     }
   }
 
@@ -76,7 +76,9 @@ export default class UserService implements IUserService {
         return await this._userRepository.updateProfileImage(userId,profileImageUrl);
         
       }
-    } catch (error) {}
+    } catch (error) {
+      throw error
+    }
   }
   async getWalletData(userId: string): Promise<IWallet | null> {
     try {

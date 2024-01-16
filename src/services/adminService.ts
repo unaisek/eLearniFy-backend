@@ -1,3 +1,4 @@
+import BadRequestError from "../common/errors/badRequestError";
 import CourseRepository from "../repositories/CourseRepository";
 import EnrolledCourseRepository from "../repositories/EnrolledCourseRepository";
 import UserRepository from "../repositories/userRepository";
@@ -28,27 +29,32 @@ export default class AdminService implements IAdminService{
         this._courseRepository = new CourseRepository();
     }
     async getAdminDashboardValue(): Promise<IAdminDashboardData> {
-
-        const totalRevenue = await this._enrolledCourseRepository.getTotalRevenue();
-        const totalUserCount = await this._userRepository.getTotalUsersCount();
-        const studentCount = await this._userRepository.getStudentCount();
-        const tutorCount = await this._userRepository.getTutorCount();
-        const courseCount = await this._courseRepository.getCourseCount();
-        const weeklyRevenueOfMonth = await this._enrolledCourseRepository.getWeeklyRevenue();
-        const currentMonthRevenue = await this._enrolledCourseRepository.getCurrentMonthRevenue()
-        const paidAndFreeCourseCount = await this._courseRepository.getPaidAndFreeCourseCount();
-
-
-        return {
-            totalRevenue,
-            totalUserCount,
-            studentCount,
-            tutorCount,
-            courseCount,
-            weeklyRevenueOfMonth,
-            currentMonthRevenue,
-            paidAndFreeCourseCount
+        try {
+            const totalRevenue = await this._enrolledCourseRepository.getTotalRevenue();
+            const totalUserCount = await this._userRepository.getTotalUsersCount();
+            const studentCount = await this._userRepository.getStudentCount();
+            const tutorCount = await this._userRepository.getTutorCount();
+            const courseCount = await this._courseRepository.getCourseCount();
+            const weeklyRevenueOfMonth = await this._enrolledCourseRepository.getWeeklyRevenue();
+            const currentMonthRevenue = await this._enrolledCourseRepository.getCurrentMonthRevenue()
+            const paidAndFreeCourseCount = await this._courseRepository.getPaidAndFreeCourseCount();
+    
+    
+            return {
+                totalRevenue,
+                totalUserCount,
+                studentCount,
+                tutorCount,
+                courseCount,
+                weeklyRevenueOfMonth,
+                currentMonthRevenue,
+                paidAndFreeCourseCount
+            }
+            
+        } catch (error) {
+            throw new BadRequestError(" Error in Fetching admin dashboard Data ")
         }
+
 
     }
 

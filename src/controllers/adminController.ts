@@ -8,16 +8,18 @@ export default class AdminController {
     constructor() {
         this._adminService = new AdminService()
     }
-  async getValuesForDashboard(req: Request, res: Response, next: NextFunction) {
-    try {
 
-        const dashboardData = await this._adminService.getAdminDashboardValue();
-        console.log(dashboardData);
-        res.status(200).json(dashboardData)
-        
+    
+    async getValuesForDashboard(req: Request, res: Response, next: NextFunction) {
+        try {
 
-    } catch (error) {
-      next(error);
+            const dashboardData = await this._adminService.getAdminDashboardValue();
+            console.log(dashboardData);
+            res.status(200).json(dashboardData)
+            
+
+        } catch (error) {
+        next(error);
+        }
     }
-  }
 }
