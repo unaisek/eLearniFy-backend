@@ -1,3 +1,4 @@
+
 import Coupon, { ICoupon } from "../models/Coupon";
 import { ICouponRepository } from "./interfaces/ICouponRepository";
 
@@ -47,6 +48,45 @@ export default class CouponRepository implements ICouponRepository{
                 { $set: { status: status } },
                 { new: true }
             )
+            
+        } catch (error) {
+            throw error
+        }
+    }
+
+    async getAllCouponsForStudent(userId: string): Promise<ICoupon[] | null> {
+        try {
+
+            const currentDate = new Date();
+            const coupons = await Coupon.find({
+                status: true,
+                expiredDate: { $gt: currentDate },
+                usedUser: { $ne: userId }
+            });
+            return coupons
+            
+            
+        } catch (error) {
+            throw error
+        }
+    }
+    async findCouponById(couponId: string): Promise<ICoupon | null> {
+        try {
+
+            return await Coupon.findById(couponId)
+            
+        } catch (error) {
+            throw error
+        }
+    }
+
+    async addUserToCoupon(couponId: string, userId: string): Promise<void> {
+        try {
+
+            await Coupon.findByIdAndUpdate(
+                couponId,
+                { $addToSet: { usedUser: userId } }
+            );
             
         } catch (error) {
             throw error

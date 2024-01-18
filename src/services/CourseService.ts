@@ -1,6 +1,6 @@
 import AwsS3Service from "./AwsService";
 import { ICourseService } from "./interfaces/ICourseService";
-import e, { Request } from 'express';
+import { Request } from 'express';
 import dotenv from 'dotenv';
 import CourseRepository from "../repositories/CourseRepository";
 import { ICourse } from "../models/Course";
@@ -10,10 +10,13 @@ import EnrolledCourseRepository from "../repositories/EnrolledCourseRepository";
 import { IEnrolledCourse } from "../models/EnrolledCourse";
 import UserRepository from "../repositories/userRepository";
 import WalletRepository from "../repositories/WalletRepository";
-import { error } from "console";
+import { error, log } from "console";
 import { IReview } from "../models/Review";
 import ReviewRepository from "../repositories/ReviewRepository";
 import BadRequestError from "../common/errors/badRequestError";
+import CouponRepository from "../repositories/CouponRepository";
+import { IPaymentData } from "./CouponService";
+import { IWalletTransaction } from "../models/Wallet";
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
 dotenv.config();
 
@@ -29,6 +32,7 @@ export default class CourseService implements ICourseService {
   private _userRepository:UserRepository;
   private _walletRepository: WalletRepository;
   private _reviewRepository: ReviewRepository;
+  private _couponRepository: CouponRepository
 
   constructor() {
     this._awsService = new AwsS3Service();
@@ -37,6 +41,7 @@ export default class CourseService implements ICourseService {
     this._userRepository = new UserRepository();
     this._walletRepository = new WalletRepository();
     this._reviewRepository = new ReviewRepository();
+    this._couponRepository = new CouponRepository();
   }
   async addNewCourse(req: Request): Promise<Partial<ICourse> | null> {
     try {
@@ -329,7 +334,7 @@ export default class CourseService implements ICourseService {
 
 
 //  make stripe payment checkout session
-  async createCheckoutSession(courseId: string, userId: string): Promise<string> {
+  async createCheckoutSession(courseId: string, userId: string, couponId:string, paymentData:IPaymentData): Promise<string | IEnrolledCourse> {
     try {
       
       const checkenrolled = await this._enrolledRepository.checkEnrolledCourse(userId,courseId);
@@ -337,11 +342,62 @@ export default class CourseService implements ICourseService {
         if(checkenrolled?.status == true){
           throw new BadRequestError("Course already enrolled")
         }
-      }
+      }      
       const course = await this._courseRepository.findCourseById(courseId);
       if(!course){
         throw new BadRequestError("Course not found")
       }
+      const paymentMethod = paymentData.paymentMethod;
+
+      // wallet payment
+
+      if(paymentMethod == "wallet"){
+        let coursPrice = parseInt(course?.price);
+
+        if(couponId !==''){
+          const couponData = await this._couponRepository.findCouponById(couponId); 
+          if(couponData?.discountType == "fixed"){
+            coursPrice = coursPrice - parseInt(couponData?.discountAmount!);
+            
+          } else {
+            coursPrice = coursPrice - Math.floor(coursPrice * ( parseInt(couponData?.discountAmount!) / 100 )) ;
+          }         
+        }
+
+        // const userWalletData = this._walletRepository.findWalletByUser(userId);
+        const description = `${course.title} Purchase with wallet`
+        const transactionType = "Debited";
+        const transactionsData :IWalletTransaction = {
+          amount:-coursPrice,
+          transactionType,
+          description
+        }
+
+        await this._walletRepository.addTransctionToWallet(userId,transactionsData);
+        const enrolledCourse = await this.enrollCourse(course._id, userId, couponId)
+
+        if(enrolledCourse){
+          return enrolledCourse
+        }
+      }
+
+
+      let courseAmount = parseInt(course?.price!) * 100;
+      if(couponId !==''){
+        const couponData = await this._couponRepository.findCouponById(couponId);
+        if(couponData){
+          if(couponData.discountType == "fixed"){
+            let discountedAmount = parseInt(course?.price!)- parseInt(couponData?.discountAmount!)
+            courseAmount = discountedAmount * 100    
+          } else {
+            let discountedAmount = parseInt(course?.price) - Math.floor(parseInt(course.price) * ( parseInt(couponData?.discountAmount!)/100 ));
+            courseAmount = discountedAmount * 100   
+          }
+        } else {
+          throw  new BadRequestError("Couponn not found")
+        }
+      }
+
       const session = await stripe.checkout.sessions.create({
         payment_method_types: ["card"],
         mode: "payment",
@@ -352,14 +408,15 @@ export default class CourseService implements ICourseService {
               product_data: {
                 name: course?.title as string,
               },
-              unit_amount: parseInt(course?.price!) * 100,
+              unit_amount: courseAmount,
             },
             quantity: 1,
           },
         ],
-        success_url: `${process.env.CLIENT_URL}/user/payment-success?courseId=${course?._id}`,
+        success_url: `${process.env.CLIENT_URL}/user/payment-success?courseId=${course?._id}&couponId=${couponId}`,
         cancel_url: `${process.env.CLIENT_URL}/user/course-over-view/${course?._id}`,
-      });     
+      });  
+         
       return session.id
 
     } catch (error) {
@@ -367,6 +424,7 @@ export default class CourseService implements ICourseService {
     }
       
   }
+
 
   async unlistCourse(courseId: string): Promise<ICourse | null> {
     try {
@@ -398,7 +456,7 @@ export default class CourseService implements ICourseService {
     }
   }
 
-  async enrollCourse(courseId: string, userId: string): Promise<IEnrolledCourse | null > {
+  async enrollCourse(courseId: string, userId: string, couponId:string): Promise<IEnrolledCourse | null > {
     try {
 
       const checkenrolled = await this._enrolledRepository.checkEnrolledCourse(userId,courseId);
@@ -408,7 +466,7 @@ export default class CourseService implements ICourseService {
           const enrolledData = await this._enrolledRepository.updateEnrolledCourseStatus(userId,courseId,true);
           await this._courseRepository.addEnrolledUserToCourse(
             courseId,
-            userId
+            userId,
           );
           const courseData = await this._courseRepository.findCourseById(
             courseId
@@ -416,6 +474,9 @@ export default class CourseService implements ICourseService {
 
           if(courseData?.courseType == "paid"){
             await this.handleTutorRevenue(courseData)
+          }
+          if(couponId !== ''){
+            await this._couponRepository.addUserToCoupon(couponId,userId)
           }
           return enrolledData
         } else {
@@ -455,7 +516,7 @@ export default class CourseService implements ICourseService {
 
   async handleTutorRevenue(courseData:ICourse){
     try {
-       const tutorRevenue = Math.round(
+       const tutorRevenue = Math.floor(
          parseInt(courseData?.price) * (TUTOR_COURSE_PERCENTAGE / 100)
        );
        const description = `Course Enrollment revenue from ${courseData?.title}`;
@@ -509,7 +570,7 @@ export default class CourseService implements ICourseService {
       if(courseData?.courseType === "paid"){
         const tutorId = courseData?.tutor
         if(tutorId){
-          const tutorRevenue = Math.round(
+          const tutorRevenue = Math.floor(
             parseInt(courseData?.price) * (TUTOR_COURSE_PERCENTAGE / 100)
           );
   

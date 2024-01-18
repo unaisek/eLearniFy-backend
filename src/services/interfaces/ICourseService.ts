@@ -3,6 +3,7 @@ import { ICourse } from "../../models/Course";
 import { IChapter } from "../../models/Chapter";
 import { IEnrolledCourse } from "../../models/EnrolledCourse";
 import { IReview } from "../../models/Review";
+import { IPaymentData } from "../CouponService";
 
 
 
@@ -36,7 +37,7 @@ export interface ICourseService {
 
   getAllCourseForStudents(): Promise<ICourse[] | null>;
 
-  createCheckoutSession(courseId: string, userId: string): Promise<string>;
+  createCheckoutSession(courseId: string, userId: string, couponId:string, paymentData: IPaymentData): Promise<string | IEnrolledCourse>;
 
   unlistCourse(courseId: string): Promise<ICourse | null>;
 
@@ -49,7 +50,8 @@ export interface ICourseService {
 
   enrollCourse(
     courseId: string,
-    userId: string
+    userId: string,
+    couponId: string
   ): Promise<IEnrolledCourse | null>;
   getEnrolledCoursesForUser(userId: string): Promise<IEnrolledCourse[] | null>;
 
@@ -76,6 +78,8 @@ export interface ICourseService {
   ): Promise<IReview | null>;
 
   getAllReviewsOfCourse(courseId: string): Promise<IReview[] | null>;
+
+  // paymentWithWallet(courseId: string, userId: string, paymentData:IPaymentData ): Promise<IEnrolledCourse | null>
 
   // addRatingForCourse(courseId: string, userId: string, rating: number): Promise<IReview | null>
 }

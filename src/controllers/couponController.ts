@@ -52,7 +52,6 @@ export default class CouponController {
       const { couponId } = req.body;
 
       const updatedData = await this._couponService.unlistCoupon(couponId);
-      console.log(updatedData);
       
       if (updatedData) {
         res.status(200).json(updatedData);
@@ -72,6 +71,33 @@ export default class CouponController {
       }
     } catch (error) {
       next(error);
+    }
+  }
+
+  async getAllCouponsForStudent(req:Request, res:Response, next:NextFunction){
+    try {
+
+        const userId = req.params.userId;
+        const coupons = await this._couponService.getAllCouponsForStudent(userId);
+        res.status(200).json(coupons)
+        
+    } catch (error) {
+        next(error)
+    }
+  }
+
+  async applyCoupon(req: Request, res:Response, next: NextFunction){
+    try {
+        const couponId = req.query.couponId as string;
+        const courseId = req.query.courseId as string;
+        const userId = req.query.userId as string;
+        
+
+        const couponData = await this._couponService.applyCoupon(couponId,courseId,userId);
+        res.status(200).json(couponData)
+        
+    } catch (error) {
+        next(error)
     }
   }
 }

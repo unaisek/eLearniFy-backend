@@ -108,7 +108,6 @@ export default class CourseController {
       const courseId = req.params.courseId;
 
       const files = req.files as Express.Multer.File[];
-      console.log(files);
       
       const { courseTitle } = req.body;
 
@@ -144,17 +143,20 @@ export default class CourseController {
     }
   }
 
-  // stripe Payment
+  //  Payment
 
   async coursePayment(req: Request, res: Response, next: NextFunction) {
     try {
-      const { courseId, userId } = req.body;
-      const sessionId = await this._courseService.createCheckoutSession(
+      const { courseId, userId,couponId, paymentData } = req.body;
+      
+      const data = await this._courseService.createCheckoutSession(
         courseId,
-        userId
+        userId,
+        couponId,
+        paymentData
       );
 
-      res.status(200).json(sessionId);
+      res.status(200).json(data);
     } catch (error) {
       next(error);
     }
@@ -199,10 +201,11 @@ export default class CourseController {
 
   async enrollCourse(req: Request, res: Response, next: NextFunction) {
     try {
-      const { userId, courseId } = req.body;
+      const { userId, courseId ,couponId } = req.body;
       const enrolledData = await this._courseService.enrollCourse(
         courseId,
-        userId
+        userId,
+        couponId
       );
       if (enrolledData) {
         res.status(200).json(enrolledData);
