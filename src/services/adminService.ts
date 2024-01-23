@@ -28,7 +28,7 @@ export default class AdminService implements IAdminService{
         this._userRepository = new UserRepository();
         this._courseRepository = new CourseRepository();
     }
-    async getAdminDashboardValue(): Promise<IAdminDashboardData> {
+    async  getAdminDashboardValue(): Promise<IAdminDashboardData> {
         try {
             const totalRevenue = await this._enrolledCourseRepository.getTotalRevenue();
             const totalUserCount = await this._userRepository.getTotalUsersCount();

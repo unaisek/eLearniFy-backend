@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
-import app from "./app";
+// import app from "./app";
 import dotenv from 'dotenv';
+import { httpServer } from "./app";
 dotenv.config();
 
 const dbUrl:string = process.env.DB_URL ||" ";
@@ -12,7 +13,6 @@ mongoose.connect(dbUrl).then(()=>{
     
 });
 
-app.listen(port,()=>{
-    console.log('Server connected successfully...');
-    
+httpServer.listen(port,()=>{
+    console.log('Server connected successfully...');   
 })

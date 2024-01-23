@@ -8,10 +8,17 @@ import tutorRoutes from "./routes/tutorRoutes";
 import userRoutes from "./routes/userRoutes";
 import dotenv from "dotenv"
 import errorHandler from "./middlewares/globalErrorHandler";
+import { createServer } from "http";
+import { io } from "./services/socketIoService";
 dotenv.config();
 
 const app = express();
+
 app.use(cors({ credentials: true, origin: process.env.CLIENT_URL! }));
+
+const httpServer = createServer(app);
+io.attach(httpServer);
+
 app.use(cookieParser());
 // app.use(bodyParser.json())
 app.use(express.json());
@@ -23,4 +30,4 @@ app.use('/api/user',userRoutes)
 
 app.use(errorHandler)
 
-export default app;
+export { httpServer };
