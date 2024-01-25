@@ -2,6 +2,9 @@ import mongoose, { Schema } from "mongoose";
 import Chapter, { IChapter } from "../models/Chapter";
 import Course,{ ICourse} from "../models/Course";
 import { ICourseRepository } from "./interfaces/ICourseRepository";
+import { error } from "console";
+import BadRequestError from "../common/errors/badRequestError";
+import { IFilter } from "../common/types/IFilter";
 
 export default class CourseRepository implements ICourseRepository {
   async createCourse(courseData: Partial<ICourse>): Promise<ICourse | null> {
@@ -75,12 +78,53 @@ export default class CourseRepository implements ICourseRepository {
     }
   }
 
-  async getCoursesForStudents(): Promise<ICourse[] | null> {
+  async getCourseForStudentHome(): Promise<ICourse[] | null> {
     try {
-      return await Course.find({ status: true })
+
+      const courses = await Course.find()
+        .sort({ createdAt: -1 })
+        .limit(6)
         .populate("tutor")
         .populate("category")
         .populate("chapters.chapter");
+      if(!courses){
+       throw new  BadRequestError("no course found")
+      }     
+      return courses
+      
+    } catch (error) {
+      throw error
+    }
+  }
+
+  async getCoursesForStudents(filter:Record<string, any>): Promise<ICourse[] | null> {
+    try {
+       const query:IFilter = { status: true };
+       
+
+       // Apply all filters from the filter object
+       if (filter.category) {        
+         query.category = filter.category;       
+       }
+       if (filter.courseType) {
+         query.courseType = filter.courseType;
+       }
+       if (filter.level) {
+         query.level = filter.level;
+       }
+       if(filter.searchValue){
+        console.log(filter.searchValue);
+        
+        query.title = {$regex: new RegExp(filter.searchValue, 'i')}
+       }
+       
+       const courses = await Course.find(query)
+         .populate("tutor")
+         .populate("category")
+         .populate("chapters.chapter");
+
+       return courses;
+
     } catch (error) {
       return null;
     }
@@ -157,28 +201,29 @@ export default class CourseRepository implements ICourseRepository {
     }
   }
   async getPaidAndFreeCourseCount(): Promise<number[]> {
-    const paidCourseCount = await Course.countDocuments({status:true, courseType:"paid"});
-    const freeCourseCount = await Course.countDocuments({status:true, courseType:"free"});
-    
-    const paidAndFreeCourse = [ paidCourseCount, freeCourseCount ];
+    const paidCourseCount = await Course.countDocuments({
+      status: true,
+      courseType: "paid",
+    });
+    const freeCourseCount = await Course.countDocuments({
+      status: true,
+      courseType: "free",
+    });
+
+    const paidAndFreeCourse = [paidCourseCount, freeCourseCount];
     return paidAndFreeCourse;
-    
   }
 
   async getTutorCourseCount(tutorId: string): Promise<number> {
-    
     try {
-
-      return await Course.countDocuments({tutor:tutorId})
-      
+      return await Course.countDocuments({ tutor: tutorId });
     } catch (error) {
-      throw error
+      throw error;
     }
   }
 
   async getEnrolledStudentCountOfTuor(tutorId: string): Promise<number> {
     try {
-
       const enrolledStudentCount = await Course.aggregate([
         {
           $match: {
@@ -192,38 +237,42 @@ export default class CourseRepository implements ICourseRepository {
           },
         },
         {
-          $group:{
-            _id:null,
-            totalEnrolledStudent: {$sum:"$studentCount" }
-          }
-        }
+          $group: {
+            _id: null,
+            totalEnrolledStudent: { $sum: "$studentCount" },
+          },
+        },
       ]);
-      
-       return enrolledStudentCount.length > 0 ? enrolledStudentCount[0].totalEnrolledStudent : 0
-      
+
+      return enrolledStudentCount.length > 0
+        ? enrolledStudentCount[0].totalEnrolledStudent
+        : 0;
     } catch (error) {
-      throw error
+      throw error;
     }
   }
 
   async getPaidCourseCountOfTutor(tutorId: string): Promise<number> {
     try {
-
-      return await Course.countDocuments({ status:true, courseType:"paid",tutor:tutorId });
-      
+      return await Course.countDocuments({
+        status: true,
+        courseType: "paid",
+        tutor: tutorId,
+      });
     } catch (error) {
-      throw error
+      throw error;
     }
   }
 
-
   async getFreeCourseCountOfTutor(tutorId: string): Promise<number> {
     try {
-
-      return await Course.countDocuments({ status:true, courseType:"free",tutor:tutorId });
-      
+      return await Course.countDocuments({
+        status: true,
+        courseType: "free",
+        tutor: tutorId,
+      });
     } catch (error) {
-      throw error
+      throw error;
     }
   }
 }

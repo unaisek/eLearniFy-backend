@@ -19,7 +19,8 @@ export interface ICourseRepository {
     chapterId: string,
     chapterData: IChapter
   ): Promise<IChapter | null>;
-  getCoursesForStudents(): Promise<ICourse[] | null>;
+  getCourseForStudentHome(): Promise<ICourse[] | null>
+  getCoursesForStudents(filter:Record<string, any>): Promise<ICourse[] | null>;
   unlistCourse(courseId: string): Promise<ICourse | null>;
   listCourse(courseId: string): Promise<ICourse | null>;
   deleteChapterFromCourse(

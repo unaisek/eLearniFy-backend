@@ -4,12 +4,15 @@ import CourseController from '../controllers/courseController';
 import UserController from '../controllers/userController';
 import { isStudentAuth } from '../middlewares/authentication';
 import CouponController from '../controllers/couponController';
+import CategoryController from '../controllers/categoryController';
 
 const router = Router();
 const courseController = new CourseController;
 const userConstroller = new UserController;
-const couponController = new CouponController
+const couponController = new CouponController;
+const categoryController = new CategoryController
 
+router.get('/home-courses',courseController.getCoursesForStudentHome.bind(courseController))
 router.get('/all-courses',courseController.getAllCoursesForStudent.bind(courseController));
 router.get('/course-overView/:id',courseController.getCourseDetails.bind(courseController));
 router.post('/create-checkout-session',isStudentAuth ,courseController.coursePayment.bind(courseController));
@@ -28,6 +31,8 @@ router.get('/review/:courseId', isStudentAuth, courseController.getAllReviewsOfC
 
 router.get('/all-coupons/:userId',isStudentAuth,couponController.getAllCouponsForStudent.bind(couponController));
 router.get('/apply-coupon',isStudentAuth,couponController.applyCoupon.bind(couponController))
+
+router.get('/categories',categoryController.getAllCategory.bind(categoryController));
 
 
 export default router;

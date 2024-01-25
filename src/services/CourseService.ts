@@ -326,10 +326,25 @@ export default class CourseService implements ICourseService {
     return await this._courseRepository.updateChapter(id, updateChapterData);
   }
 
+  async getCourseForStudentHome(): Promise<ICourse[] | null> {
+    try {
+
+      return await this._courseRepository.getCourseForStudentHome()
+      
+    } catch (error) {
+      throw error
+    }
+  }
+
 // fetching courses for students
 
- async getAllCourseForStudents(): Promise<ICourse[] | null> {
-    return await  this._courseRepository.getCoursesForStudents()
+ async getAllCourseForStudents(filter:Record<string, any>): Promise<ICourse[] | null> {
+  try {
+    return await  this._courseRepository.getCoursesForStudents(filter)
+    
+  } catch (error) {
+    throw error
+  }
  } 
 
 

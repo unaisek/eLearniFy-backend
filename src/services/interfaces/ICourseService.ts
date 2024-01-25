@@ -35,9 +35,16 @@ export interface ICourseService {
     courseTitle: string
   ): Promise<IChapter | null>;
 
-  getAllCourseForStudents(): Promise<ICourse[] | null>;
+  getCourseForStudentHome(): Promise<ICourse[] | null>;
 
-  createCheckoutSession(courseId: string, userId: string, couponId:string, paymentData: IPaymentData): Promise<string | IEnrolledCourse>;
+  getAllCourseForStudents(filter:Record<string,any>): Promise<ICourse[] | null>;
+
+  createCheckoutSession(
+    courseId: string,
+    userId: string,
+    couponId: string,
+    paymentData: IPaymentData
+  ): Promise<string | IEnrolledCourse>;
 
   unlistCourse(courseId: string): Promise<ICourse | null>;
 

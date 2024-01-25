@@ -108,7 +108,7 @@ export default class CourseController {
       const courseId = req.params.courseId;
 
       const files = req.files as Express.Multer.File[];
-      
+
       const { courseTitle } = req.body;
 
       const courseData = await this._courseService.getCourseDetails(courseId);
@@ -128,6 +128,14 @@ export default class CourseController {
     }
   }
 
+  async getCoursesForStudentHome(req: Request, res: Response, next: NextFunction) {
+    try {
+      const courses = await this._courseService.getCourseForStudentHome();
+      res.status(200).json(courses)
+    } catch (error) {
+      next(error);
+    }
+  }
   //   fetching all courses for students
 
   async getAllCoursesForStudent(
@@ -136,7 +144,23 @@ export default class CourseController {
     next: NextFunction
   ) {
     try {
-      const courseLists = await this._courseService.getAllCourseForStudents();
+      const {category, courseType, level, searchValue } = req.query;          
+      const filter:Record<string, any> = {}
+      if (category !== "all") {
+        filter.category = category;
+      }
+      if (courseType !== "all") {
+        filter.courseType = courseType;
+      }
+      if (level !== "all") {
+        filter.level = level;
+      } 
+      if(searchValue !== " "){
+        filter.searchValue = searchValue;
+      }   
+      
+      const courseLists = await this._courseService.getAllCourseForStudents(filter);
+      
       res.status(200).json(courseLists);
     } catch (error) {
       next(error);
@@ -147,8 +171,8 @@ export default class CourseController {
 
   async coursePayment(req: Request, res: Response, next: NextFunction) {
     try {
-      const { courseId, userId,couponId, paymentData } = req.body;
-      
+      const { courseId, userId, couponId, paymentData } = req.body;
+
       const data = await this._courseService.createCheckoutSession(
         courseId,
         userId,
@@ -201,7 +225,7 @@ export default class CourseController {
 
   async enrollCourse(req: Request, res: Response, next: NextFunction) {
     try {
-      const { userId, courseId ,couponId } = req.body;
+      const { userId, courseId, couponId } = req.body;
       const enrolledData = await this._courseService.enrollCourse(
         courseId,
         userId,
@@ -237,7 +261,6 @@ export default class CourseController {
         userId,
         courseId
       );
-  
 
       if (data) {
         res.status(200).json(data);
@@ -287,7 +310,7 @@ export default class CourseController {
   async addReviewForCourse(req: Request, res: Response, next: NextFunction) {
     try {
       const { courseId, userId, review } = req.body;
-                   
+
       const data = await this._courseService.addReviewForCourse(
         courseId,
         userId,
@@ -302,17 +325,17 @@ export default class CourseController {
     }
   }
 
-  async getAllReviewsOfCourse(req: Request, res: Response, next: NextFunction){
+  async getAllReviewsOfCourse(req: Request, res: Response, next: NextFunction) {
     try {
-
       const courseId = req.params.courseId;
-      const reviewData = await this._courseService.getAllReviewsOfCourse(courseId);
-      if(reviewData){
-        res.status(200).json(reviewData)
-      }     
-      
+      const reviewData = await this._courseService.getAllReviewsOfCourse(
+        courseId
+      );
+      if (reviewData) {
+        res.status(200).json(reviewData);
+      }
     } catch (error) {
-      next(error)
+      next(error);
     }
   }
 
@@ -324,8 +347,7 @@ export default class CourseController {
   //     if(data){
   //       res.status(200).json(data)
   //     }
-      
-      
+
   //   } catch (error) {
   //     throw error
   //   }
