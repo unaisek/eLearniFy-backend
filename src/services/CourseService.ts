@@ -375,7 +375,11 @@ export default class CourseService implements ICourseService {
             coursPrice = coursPrice - parseInt(couponData?.discountAmount!);
             
           } else {
-            coursPrice = coursPrice - Math.floor(coursPrice * ( parseInt(couponData?.discountAmount!) / 100 )) ;
+            let discountAmount = Math.floor(coursPrice * ( parseInt(couponData?.discountAmount!) / 100 ));
+            if(couponData?.maxDiscountAmount && discountAmount > parseInt(couponData?.maxDiscountAmount)){
+              discountAmount  = parseInt(couponData.maxDiscountAmount)
+            }
+            coursPrice = coursPrice - discountAmount ;
           }         
         }
 
@@ -405,8 +409,12 @@ export default class CourseService implements ICourseService {
             let discountedAmount = parseInt(course?.price!)- parseInt(couponData?.discountAmount!)
             courseAmount = discountedAmount * 100    
           } else {
-            let discountedAmount = parseInt(course?.price) - Math.floor(parseInt(course.price) * ( parseInt(couponData?.discountAmount!)/100 ));
-            courseAmount = discountedAmount * 100   
+            let discountedAmount = Math.floor(parseInt(course.price) * ( parseInt(couponData?.discountAmount!)/100 ));
+            if(couponData.maxDiscountAmount && discountedAmount > parseInt(couponData.maxDiscountAmount)){
+              discountedAmount = parseInt(couponData?.maxDiscountAmount)
+            }
+            const totalAmount = parseInt(course?.price) - discountedAmount
+            courseAmount = totalAmount * 100
           }
         } else {
           throw  new BadRequestError("Couponn not found")
