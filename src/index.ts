@@ -4,14 +4,17 @@ import dotenv from 'dotenv';
 import { httpServer } from "./app";
 dotenv.config();
 
-const dbUrl:string = process.env.DB_URL ||" ";
+// const dbUrl:string = process.env.DB_URL ||" ";
 const port: number = parseInt(process.env.PORT || "3000");
 
 
-mongoose.connect(dbUrl).then(()=>{  
+mongoose
+  .connect(
+    "mongodb+srv://mohammedunais:bY9vr3xYGnVQlPsN@elearnify-db.ue6xyhu.mongodb.net/?retryWrites=true&w=majority"
+  )
+  .then(() => {
     console.log("Database connected..");
-    
-});
+  });
 
 httpServer.listen(port,()=>{
     console.log('Server connected successfully...');   
