@@ -8,7 +8,7 @@ const dbUrl:string = process.env.DB_URL ||" ";
 const port: number = parseInt(process.env.PORT || "3000");
 
 
-mongoose.connect(dbUrl).then(()=>{
+mongoose.connect(dbUrl).then(()=>{  
     console.log("Database connected..");
     
 });

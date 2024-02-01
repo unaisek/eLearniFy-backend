@@ -27,7 +27,6 @@ router.put('/update-progression', isStudentAuth, courseController.updateCoursePr
 
 router.post('/add-review', isStudentAuth, courseController.addReviewForCourse.bind(courseController));
 router.get('/review/:courseId', isStudentAuth, courseController.getAllReviewsOfCourse.bind(courseController));
-// router.post('/add-rating',courseController.addRatingForCourse.bind(courseController))
 
 router.get('/all-coupons/:userId',isStudentAuth,couponController.getAllCouponsForStudent.bind(couponController));
 router.get('/apply-coupon',isStudentAuth,couponController.applyCoupon.bind(couponController))
