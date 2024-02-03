@@ -14,7 +14,7 @@ dotenv.config();
 
 const app = express();
 
-app.use(cors({ credentials: true, origin: process.env.CLIENT_URL as string }));
+app.use(cors({ credentials: true, origin:'*' }));
 
 const httpServer = createServer(app);
 io.attach(httpServer);
