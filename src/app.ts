@@ -14,7 +14,9 @@ dotenv.config();
 
 const app = express();
 
-app.use(cors({ credentials: true, origin:'*' }));
+app.use(
+  cors({ credentials: true, origin: "https://e-learni-fy-client.vercel.app" })
+);
 
 const httpServer = createServer(app);
 io.attach(httpServer);
