@@ -13,7 +13,7 @@ interface ChatMessage {
 const httpServer = createServer();
 const io = new Server(httpServer,{
     cors:{
-        origin:["http://localhost:4200"],
+        // origin:[""],
         methods:["GET","POST"]
     }
 });
