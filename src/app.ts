@@ -14,14 +14,18 @@ dotenv.config();
 
 const app = express();
 
-app.use(cors({ credentials: true, origin: process.env.CLIENT_URL as string }));
+app.use(
+  cors({
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
+  })
+);
 
 const httpServer = createServer(app);
 io.attach(httpServer);
 
 app.use(cookieParser());
 // app.use(bodyParser.json())
-app.use(express.json());
+app.use(express.json({ limit: "10mb" }));
 
 app.use('/api/auth', authRoutes);
 app.use('/api/admin', adminRoutes);
