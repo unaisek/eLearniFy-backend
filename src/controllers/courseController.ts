@@ -328,9 +328,7 @@ export default class CourseController {
   async getAllReviewsOfCourse(req: Request, res: Response, next: NextFunction) {
     try {
       const courseId = req.params.courseId;
-      const reviewData = await this._courseService.getAllReviewsOfCourse(
-        courseId
-      );
+      const reviewData = await this._courseService.getAllReviewsOfCourse(courseId);
       if (reviewData) {
         res.status(200).json(reviewData);
       }
