@@ -24,6 +24,7 @@ router.put('/upload-profile',isTutorAuth, upload.any(),userController.uploadProf
 router.put('/unlist-course/:courseId',isTutorAuth, courseController.unlistCourse.bind(courseController));
 router.put('/list-course/:courseId',isTutorAuth, courseController.listCourse.bind(courseController));
 router.put("/delete-chapter",isTutorAuth, courseController.deleteChapter.bind(courseController));
+router.get("/reviews/:courseId",isTutorAuth, courseController.getAllReviewsOfCourse.bind(courseController));
 router.get('/wallet/:userId',isTutorAuth, userController.getWalletData.bind(userController));
 router.get('/dashboard/:tutorId',isTutorAuth, tutorController.getDashboardValues.bind(tutorController))
 
