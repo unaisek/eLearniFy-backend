@@ -33,8 +33,7 @@ export default class AdminController {
             const enrolledCourses = await this._courseService.getAllEnrolledCourse(year);
             if(enrolledCourses){
                 res.status(200).json(enrolledCourses)
-            }
-            
+            }       
         } catch (error) {
             next(error)
         }
