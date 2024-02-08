@@ -34,6 +34,7 @@ adminRouter.put('/unlist-coupon',isAdminAuth, couponController.unlistCoupon.bind
 adminRouter.put("/list-coupon",isAdminAuth, couponController.listCoupon.bind(couponController));
 
 adminRouter.get('/dashboard',isAdminAuth, adminController.getValuesForDashboard.bind(adminController))
+adminRouter.get("/enrolled-courses/:year",isAdminAuth ,adminController.getAllEnrolledCourses.bind(adminController));
 
 
 export default adminRouter;

@@ -704,4 +704,14 @@ export default class CourseService implements ICourseService {
   //   }
   // }
 
+  async getAllEnrolledCourse(year:number): Promise<IReview[] | null> {
+    try {
+
+      return await this._enrolledRepository.getAllEnrolledCourseForAdmin(year)
+      
+    } catch (error) {
+      throw new BadRequestError(" Enrolled Course not found");
+    }
+  }
+
 }

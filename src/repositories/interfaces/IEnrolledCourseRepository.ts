@@ -34,5 +34,7 @@ export interface IEnrolledCourseRepo {
   getCurrentMonthRevenue(): Promise<number>;
   getTotalRevenueOfTutor(tutorId: string): Promise<number>;
   getCurrentMonthRevenueForTutor(tutorId: string): Promise<number>;
-  getThreeDaysRevenueOfTutor(tutorId: string): Promise<number[]>
+  getThreeDaysRevenueOfTutor(tutorId: string): Promise<number[]>;
+
+  getAllEnrolledCourseForAdmin(year: number):Promise<IEnrolledCourse[] | null>
 }

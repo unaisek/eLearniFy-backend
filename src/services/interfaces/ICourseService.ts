@@ -37,7 +37,9 @@ export interface ICourseService {
 
   getCourseForStudentHome(): Promise<ICourse[] | null>;
 
-  getAllCourseForStudents(filter:Record<string,any>): Promise<ICourse[] | null>;
+  getAllCourseForStudents(
+    filter: Record<string, any>
+  ): Promise<ICourse[] | null>;
 
   createCheckoutSession(
     courseId: string,
@@ -85,6 +87,7 @@ export interface ICourseService {
   ): Promise<IReview | null>;
 
   getAllReviewsOfCourse(courseId: string): Promise<IReview[] | null>;
+  getAllEnrolledCourse(year:number):Promise<IReview[] | null>
 
   // paymentWithWallet(courseId: string, userId: string, paymentData:IPaymentData ): Promise<IEnrolledCourse | null>
 

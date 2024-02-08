@@ -417,4 +417,34 @@ export default class EnrolledCourseRepository implements IEnrolledCourseRepo {
       throw error
     }
   }
+
+  async getAllEnrolledCourseForAdmin( year: number): Promise<IEnrolledCourse[] | null> {
+    try {
+      const startDate = new Date(year, 0, 1);
+      const endDate = new Date(year + 1, 0, 1);
+      return await EnrolledCourse.find({
+        createdAt: { $gte:startDate, $lt:endDate }
+      }).populate({
+        path: "courseId",
+        model: "Course",
+        populate: [
+          {
+            path: "category",
+            model: "Category",
+          },
+          {
+            path: "chapters.chapter",
+            model: "Chapter",
+          },
+          {
+            path: "tutor",
+            model: "User",
+          },
+        ]
+      }).populate("userId").sort({createdAt:-1})
+      
+    } catch (error) {
+      throw error
+    }
+  }
 }
